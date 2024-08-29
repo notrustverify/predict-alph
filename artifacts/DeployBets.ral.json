@@ -1,0 +1,118 @@
+{
+  "version": "v3.6.0",
+  "name": "DeployBets",
+  "bytecode": "0302409940c20103111f004056d32160e9a6b417110c0c0c0c0c0c0c0c0c0c171e171d171c171b171a17191718171717161715b1ce01160b1611160c160d1600a000160116021603160416051606160716081609160a160e160f1610131564040c0c0c16151616161716181619161a161b161c161d161e0c0c0c131164171317121611d1a2a00040ce0016121613c117140516141611a00060a0000d2aa100010002040015d3706f33e4b31702160040cb170316031602410d7b0616031601160060a0000d2ba100",
+  "codeHash": "89aa9560810cce4fc08439d52bf20a839df9e40b4a8e57a35b0dc5065423af2c",
+  "fieldsSig": {
+    "names": [
+      "predictionTemplateId",
+      "punterChoiceTemplateId",
+      "contractIndex"
+    ],
+    "types": [
+      "ByteVec",
+      "ByteVec",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "NewBetDeployed",
+      "fieldNames": [
+        "contractId",
+        "deployedFrom",
+        "index"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "Address",
+        "U256"
+      ]
+    },
+    {
+      "name": "BetDeleted",
+      "fieldNames": [
+        "contractId",
+        "deletedBy",
+        "index"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "Address",
+        "U256"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "deployBet",
+      "paramNames": [
+        "title",
+        "choicesName",
+        "endTimestamp",
+        "claimedByAnyoneTimestamp",
+        "endBeforeEnd",
+        "tokenIdToVote",
+        "tokenIdToHodl",
+        "amountToHodl"
+      ],
+      "paramTypes": [
+        "ByteVec",
+        "[ByteVec;10]",
+        "U256",
+        "U256",
+        "Bool",
+        "ByteVec",
+        "ByteVec",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "deleteBet",
+      "paramNames": [
+        "contractIndexToDelete",
+        "deletor"
+      ],
+      "paramTypes": [
+        "U256",
+        "Address"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "InvalidCaller",
+          "value": {
+            "type": "U256",
+            "value": "1"
+          }
+        }
+      ]
+    }
+  ]
+}

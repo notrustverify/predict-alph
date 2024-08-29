@@ -25,10 +25,13 @@ import {
   getContractEventsCurrentCount,
   TestContractParamsWithoutMaps,
   TestContractResultWithoutMaps,
+  SignExecuteContractMethodParams,
+  SignExecuteScriptTxResult,
+  signExecuteMethod,
   addStdIdToFields,
   encodeContractFields,
 } from "@alephium/web3";
-import { default as PunterChoiceContractJson } from "../PunterChoice.ral.json";
+import { default as PunterChoiceContractJson } from "../multiple-choice/PunterChoice.ral.json";
 import { getContractByCodeHash } from "./contracts";
 
 // Custom types for the contract
@@ -36,7 +39,6 @@ export namespace PunterChoiceTypes {
   export type Fields = {
     predictionContractId: HexString;
     punterAddress: Address;
-    epoch: bigint;
     side: bigint;
     amountBid: bigint;
     claimedByAnyoneAt: bigint;
@@ -57,13 +59,13 @@ export namespace PunterChoiceTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
     };
-    getRoundEpoch: {
-      params: Omit<CallContractParams<{}>, "args">;
-      result: CallContractResult<bigint>;
-    };
     getClaimedByAnyone: {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<bigint>;
+    };
+    destroy: {
+      params: CallContractParams<{ from: Address }>;
+      result: CallContractResult<null>;
     };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
@@ -78,6 +80,37 @@ export namespace PunterChoiceTypes {
       ? CallMethodTable[MaybeName]["result"]
       : undefined;
   };
+  export type MulticallReturnType<Callss extends MultiCallParams[]> =
+    Callss["length"] extends 1
+      ? MultiCallResults<Callss[0]>
+      : { [index in keyof Callss]: MultiCallResults<Callss[index]> };
+
+  export interface SignExecuteMethodTable {
+    getAddress: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getBid: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getAmountBid: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    getClaimedByAnyone: {
+      params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    destroy: {
+      params: SignExecuteContractMethodParams<{ from: Address }>;
+      result: SignExecuteScriptTxResult;
+    };
+  }
+  export type SignExecuteMethodParams<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["params"];
+  export type SignExecuteMethodResult<T extends keyof SignExecuteMethodTable> =
+    SignExecuteMethodTable[T]["result"];
 }
 
 class Factory extends ContractFactory<
@@ -92,11 +125,7 @@ class Factory extends ContractFactory<
     );
   }
 
-  getInitialFieldsWithDefaultValues() {
-    return this.contract.getInitialFieldsWithDefaultValues() as PunterChoiceTypes.Fields;
-  }
-
-  consts = { ErrorCodes: { InvalidCaller: BigInt(200) } };
+  consts = { ErrorCodes: { InvalidCaller: BigInt("200") } };
 
   at(address: string): PunterChoiceInstance {
     return new PunterChoiceInstance(address);
@@ -109,7 +138,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<Address>> => {
-      return testMethod(this, "getAddress", params);
+      return testMethod(this, "getAddress", params, getContractByCodeHash);
     },
     getBid: async (
       params: Omit<
@@ -117,7 +146,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getBid", params);
+      return testMethod(this, "getBid", params, getContractByCodeHash);
     },
     getAmountBid: async (
       params: Omit<
@@ -125,15 +154,7 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getAmountBid", params);
-    },
-    getRoundEpoch: async (
-      params: Omit<
-        TestContractParamsWithoutMaps<PunterChoiceTypes.Fields, never>,
-        "testArgs"
-      >
-    ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getRoundEpoch", params);
+      return testMethod(this, "getAmountBid", params, getContractByCodeHash);
     },
     getClaimedByAnyone: async (
       params: Omit<
@@ -141,7 +162,12 @@ class Factory extends ContractFactory<
         "testArgs"
       >
     ): Promise<TestContractResultWithoutMaps<bigint>> => {
-      return testMethod(this, "getClaimedByAnyone", params);
+      return testMethod(
+        this,
+        "getClaimedByAnyone",
+        params,
+        getContractByCodeHash
+      );
     },
     destroy: async (
       params: TestContractParamsWithoutMaps<
@@ -149,7 +175,7 @@ class Factory extends ContractFactory<
         { from: Address }
       >
     ): Promise<TestContractResultWithoutMaps<null>> => {
-      return testMethod(this, "destroy", params);
+      return testMethod(this, "destroy", params, getContractByCodeHash);
     },
   };
 }
@@ -159,7 +185,7 @@ export const PunterChoice = new Factory(
   Contract.fromJson(
     PunterChoiceContractJson,
     "",
-    "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
+    "8e136164cc165fab36e544f81ac788822b6a33aad1c259a700b203931d69ac26",
     []
   )
 );
@@ -174,7 +200,7 @@ export class PunterChoiceInstance extends ContractInstance {
     return fetchContractState(PunterChoice, this);
   }
 
-  methods = {
+  view = {
     getAddress: async (
       params?: PunterChoiceTypes.CallMethodParams<"getAddress">
     ): Promise<PunterChoiceTypes.CallMethodResult<"getAddress">> => {
@@ -208,17 +234,6 @@ export class PunterChoiceInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
-    getRoundEpoch: async (
-      params?: PunterChoiceTypes.CallMethodParams<"getRoundEpoch">
-    ): Promise<PunterChoiceTypes.CallMethodResult<"getRoundEpoch">> => {
-      return callMethod(
-        PunterChoice,
-        this,
-        "getRoundEpoch",
-        params === undefined ? {} : params,
-        getContractByCodeHash
-      );
-    },
     getClaimedByAnyone: async (
       params?: PunterChoiceTypes.CallMethodParams<"getClaimedByAnyone">
     ): Promise<PunterChoiceTypes.CallMethodResult<"getClaimedByAnyone">> => {
@@ -230,16 +245,62 @@ export class PunterChoiceInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    destroy: async (
+      params: PunterChoiceTypes.CallMethodParams<"destroy">
+    ): Promise<PunterChoiceTypes.CallMethodResult<"destroy">> => {
+      return callMethod(
+        PunterChoice,
+        this,
+        "destroy",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
-  async multicall<Calls extends PunterChoiceTypes.MultiCallParams>(
-    calls: Calls
-  ): Promise<PunterChoiceTypes.MultiCallResults<Calls>> {
+  transact = {
+    getAddress: async (
+      params: PunterChoiceTypes.SignExecuteMethodParams<"getAddress">
+    ): Promise<PunterChoiceTypes.SignExecuteMethodResult<"getAddress">> => {
+      return signExecuteMethod(PunterChoice, this, "getAddress", params);
+    },
+    getBid: async (
+      params: PunterChoiceTypes.SignExecuteMethodParams<"getBid">
+    ): Promise<PunterChoiceTypes.SignExecuteMethodResult<"getBid">> => {
+      return signExecuteMethod(PunterChoice, this, "getBid", params);
+    },
+    getAmountBid: async (
+      params: PunterChoiceTypes.SignExecuteMethodParams<"getAmountBid">
+    ): Promise<PunterChoiceTypes.SignExecuteMethodResult<"getAmountBid">> => {
+      return signExecuteMethod(PunterChoice, this, "getAmountBid", params);
+    },
+    getClaimedByAnyone: async (
+      params: PunterChoiceTypes.SignExecuteMethodParams<"getClaimedByAnyone">
+    ): Promise<
+      PunterChoiceTypes.SignExecuteMethodResult<"getClaimedByAnyone">
+    > => {
+      return signExecuteMethod(
+        PunterChoice,
+        this,
+        "getClaimedByAnyone",
+        params
+      );
+    },
+    destroy: async (
+      params: PunterChoiceTypes.SignExecuteMethodParams<"destroy">
+    ): Promise<PunterChoiceTypes.SignExecuteMethodResult<"destroy">> => {
+      return signExecuteMethod(PunterChoice, this, "destroy", params);
+    },
+  };
+
+  async multicall<Callss extends PunterChoiceTypes.MultiCallParams[]>(
+    ...callss: Callss
+  ): Promise<PunterChoiceTypes.MulticallReturnType<Callss>> {
     return (await multicallMethods(
       PunterChoice,
       this,
-      calls,
+      callss,
       getContractByCodeHash
-    )) as PunterChoiceTypes.MultiCallResults<Calls>;
+    )) as PunterChoiceTypes.MulticallReturnType<Callss>;
   }
 }

@@ -1,223 +1,74 @@
 {
-  "fullNodeVersion": "v2.12.0",
+  "fullNodeVersion": "v3.6.0",
   "compilerOptionsUsed": {
     "ignoreUnusedConstantsWarnings": false,
     "ignoreUnusedVariablesWarnings": false,
     "ignoreUnusedFieldsWarnings": false,
     "ignoreUnusedPrivateFunctionsWarnings": false,
     "ignoreUpdateFieldsCheckWarnings": false,
-    "ignoreCheckExternalCallerWarnings": false
+    "ignoreCheckExternalCallerWarnings": false,
+    "ignoreUnusedFunctionReturnWarnings": false
   },
   "infos": {
-    "BidChoice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
     "BidMultipleChoice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
+      "sourceFile": "scripts/punterActions.ral",
+      "sourceCodeHash": "c940cdc5b7ecf7a4e16afa637de6cb8f2851cc4ef611b52995339f0efa2e517e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "BidPrice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
+    "BoostBet": {
+      "sourceFile": "scripts/punterActions.ral",
+      "sourceCodeHash": "c940cdc5b7ecf7a4e16afa637de6cb8f2851cc4ef611b52995339f0efa2e517e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "BoostRound": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
+    "ClaimMultipleChoice": {
+      "sourceFile": "scripts/punterActions.ral",
+      "sourceCodeHash": "c940cdc5b7ecf7a4e16afa637de6cb8f2851cc4ef611b52995339f0efa2e517e",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "BoostRoundChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
+    "DeployBets": {
+      "sourceFile": "deployBet.ral",
+      "sourceCodeHash": "cb82601f624b50ed5a04022a7c39056322e3b0fc37bff4eb29ad5b229de828b6",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": "89aa9560810cce4fc08439d52bf20a839df9e40b4a8e57a35b0dc5065423af2c"
     },
-    "BoostRoundMultipleChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
+    "DeployNewBet": {
+      "sourceFile": "scripts/deployBet.ral",
+      "sourceCodeHash": "22ae3306e9d5d7b788ce1f35cc0875820d16ba352d99404ef5fcb8167af0e176",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "DestroyPredict": {
-      "sourceFile": "predictActions.ral",
-      "sourceCodeHash": "030394cfea2278dcac94b5e0d196855414ca2f9ad2a83ece4d317244232fdd2b",
+    "DestroyBet": {
+      "sourceFile": "scripts/bets.ral",
+      "sourceCodeHash": "965285409c98a1b41cd33c75e564a1680e23884a106d49cfb5151dc1f2f4b968",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "DestroyRound": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "DestroyRoundChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "DestroyRoundMultipleChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
     "DynamicArrayForInt": {
       "sourceFile": "dynamicArrayInt.ral",
       "sourceCodeHash": "42a29e9385244f0d93bcdf0133fc11a9e627019dca1bcd2a321aba71187cc546",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "End": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
+    "EndBet": {
+      "sourceFile": "scripts/bets.ral",
+      "sourceCodeHash": "965285409c98a1b41cd33c75e564a1680e23884a106d49cfb5151dc1f2f4b968",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": ""
     },
-    "EndChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "EndMultipleChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "NewInterval": {
-      "sourceFile": "parameters.ral",
-      "sourceCodeHash": "3770b695a5fba6f0820db9a822b1004c7d93cd6d5efe917371ffc4b3f4946a92",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "NewIntervalChoice": {
-      "sourceFile": "parameters.ral",
-      "sourceCodeHash": "3770b695a5fba6f0820db9a822b1004c7d93cd6d5efe917371ffc4b3f4946a92",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "PredictChoice": {
-      "sourceFile": "choice/predict.ral",
-      "sourceCodeHash": "9f8f151eac000ca30cb8aef41a7e4f134d745e3d78d9c98024ed527af207894b",
-      "bytecodeDebugPatch": "=10-4=1+a=1+090=2-2+ab=2-2+b=1-3=2-1+2=2-1=1-1+8a=2-2+51=3-1+2=2+5a4=1-1+74=2-2+92=2-2+a2=2-2+b2=2-2+c2=2-2+d2=2-2+e3=81-1+e=24+7e0218526f756e6443686f69636520636f6e747261637420696420001601=25-1+d=18+16017e0218526f756e6443686f69636520636f6e74726163742069642000=1720",
-      "codeHashDebug": "ecb96930aa7105c7466435463df9d9186a5459ff9cf7688192cb2c93fd69d9c0",
-      "warnings": []
-    },
-    "PredictMultipleChoice": {
-      "sourceFile": "multiple-choice/predict.ral",
-      "sourceCodeHash": "8950bb18cba55c073866a4c0d5278c108e0cfafee7ed29f2bb66d62a5e569ccc",
-      "bytecodeDebugPatch": "=10+6=1-1=2-2+a2=2-2+bd=2-2+c6=2-2+70=2-2+cc=2-3+9=1-2=2+5=1-1=2-2+9c=2-1+b=3-2+d=1-3=2-2+e=1-3=2-2+f4440444144425=81-1+e=24+7e024020526f756e644d756c7469706c6543686f69636520636f6e747261637420696420001601=25-1+d=18+16017e024020526f756e644d756c7469706c6543686f69636520636f6e74726163742069642000=1816",
-      "codeHashDebug": "c3de0f802c4792d2bb804ac63bffec83c8b6935870baa2edfaa7b2f808a6c677",
-      "warnings": []
-    },
-    "PredictPrice": {
-      "sourceFile": "price/predict.ral",
-      "sourceCodeHash": "866b6b307a4306be1465bd07c1ea815d976a92bd29553ac6de4c23410f83d559",
-      "bytecodeDebugPatch": "=10-2+54=2-1+8=3-1+9=3-1+a=2-2+11=3-1+6=2+2=1-1=3-1+d=2+3=1-1=3-1+3=3-1+5=3-1+6=3-1+7=3-1+8=3-1+9=82-1+e=24+7e0212526f756e6420636f6e747261637420696420001601=25-1+d=18+16017e0212526f756e6420636f6e74726163742069642000=1600",
-      "codeHashDebug": "35cff66724106a4953bc380897ceb4742e7ece4a52cf282df9e3f8be0cba6e7e",
-      "warnings": []
-    },
-    "Punter": {
-      "sourceFile": "punter.ral",
-      "sourceCodeHash": "903a9c7009e1fc66628dba4640440e8cbc6dcb3b62fdecc1db331c8ae08ee404",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
-      "warnings": []
+    "MultipleChoice": {
+      "sourceFile": "multiple-choice/round.ral",
+      "sourceCodeHash": "4896bb28313f11b2da0d91f8f9f1016f902ade1ebce4a7dd365c7b946379b2b9",
+      "bytecodeDebugPatch": "=41-4=1+0=1-1=3-1+1=3-1+b42d7=579-1+f=269-1+d=14+ce141600160a7e040c416d6f756e7420686f646c20092e20616d6f756e74200a2c20686f646c696e672000=504",
+      "codeHashDebug": "26aa6cd833122f9479d45591000b21cf475524982b55a5856cb43b96e9d83be9"
     },
     "PunterChoice": {
-      "sourceFile": "punterChoice.ral",
-      "sourceCodeHash": "d51b047e24d84e916cc870369b8a6f625ca6589cc22178c4580ad9555264412d",
+      "sourceFile": "multiple-choice/punterChoice.ral",
+      "sourceCodeHash": "5be0a0846646a58acf37609462531dce9dce5fe81ac83812dc92218e3d128fe0",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "75f2d8bff475bcac7c2b6f3a6c7ecfffadcf7727e469f9001de2aadada85b12a",
-      "warnings": []
-    },
-    "Round": {
-      "sourceFile": "price/round.ral",
-      "sourceCodeHash": "116330ad4b9e59448a4fa0204bcd4ed0347cefb3be70ed88576f718e6cf5377d",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "4a43dd8c1ec8b2bb5e5e2234577ed61f088f55168fb510d2921569860b2c8fd1",
-      "warnings": []
-    },
-    "RoundChoice": {
-      "sourceFile": "choice/round.ral",
-      "sourceCodeHash": "509d3c9e019376975e633356de45ae2cb402a738b08c25808f8a92c3e49a36e7",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "0717a84b354f15ff0b88e2c94d4403a89cc33ce0d091bc82f3efc838e92bd80c",
-      "warnings": []
-    },
-    "RoundMultipleChoice": {
-      "sourceFile": "multiple-choice/round.ral",
-      "sourceCodeHash": "a5d795447be7ac029b78920eb55d9700f4b568a1f91dddae3f5b9a059353f3be",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "be3962d657d282ee227e7044c4f4c7db14cda636a4262a3ed7b9975642ab7ac1",
-      "warnings": []
-    },
-    "Start": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "StartChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "StartMultipleChoice": {
-      "sourceFile": "roundActions.ral",
-      "sourceCodeHash": "b2a8eaaaf0284e8d7a09a43f921e7da5e5dd1334ef83608198a98f26d36fd669",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "WithdrawChoice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "WithdrawMultipleChoice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
-    },
-    "WithdrawPrice": {
-      "sourceFile": "punterActions.ral",
-      "sourceCodeHash": "66cea2c5092980eb2a25b678f6c8b8e23948936ce3255b3c8a34ccdf01f46ec6",
-      "bytecodeDebugPatch": "",
-      "codeHashDebug": "",
-      "warnings": []
+      "codeHashDebug": "8e136164cc165fab36e544f81ac788822b6a33aad1c259a700b203931d69ac26"
     }
   }
 }

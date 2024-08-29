@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@alephium/cli@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@alephium/cli/-/cli-0.41.0.tgz#4bb315522c65d144e7cd40a226f319509f59f739"
-  integrity sha512-1QKFOk/C3CTaP1PjrRtSQ0WkDtS5Kx5i5Zca83omm4oKlNoWWo9vW8VGOHS5VHP9fuEcqjx2fqQEJizI5N87DQ==
+"@alephium/cli@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@alephium/cli/-/cli-1.5.2.tgz#b40d98d0fbb87160a69f8c33ed8ec673d1dce037"
+  integrity sha512-75Ch6i9Z9IGUKeTZiA0lCsIq/L2evIOtKTnxgR9Q6hELGBaHOdY1rBixck8MYPoTnDd9R9vMzJxLS4VyKMkEFA==
   dependencies:
-    "@alephium/web3" "^0.41.0"
-    "@alephium/web3-wallet" "^0.41.0"
+    "@alephium/web3" "^1.5.2"
+    "@alephium/web3-wallet" "^1.5.2"
     "@swc/core" "^1.4.1"
     commander "^9.5.0"
     cross-fetch "^3.1.5"
@@ -18,40 +18,37 @@
     jest "^28.1.3"
     prettier "^2.8.7"
 
-"@alephium/web3-test@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@alephium/web3-test/-/web3-test-0.41.0.tgz#45605bab389791f3fe23b7c693f36e5b9a5bcb09"
-  integrity sha512-hDmeQWWF1r2zqAzDHstU/TmpNPjnZLBm9NnfuzncfnxtoeXM/w3HetzHcMgNOypkMQ4BWrrbK00j4n7u7fHNDA==
+"@alephium/web3-test@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@alephium/web3-test/-/web3-test-1.5.2.tgz#e3434a32e4fa4a3ff5ccbd39cbdec12771a227fa"
+  integrity sha512-O0ihwWHIf/+mym/ZsJ0xEwD5VvFrfn9Iw0Uj5Oso6byV8uEyjDxWSKb2xSUOgttgvtnZ+VSFpS3jNWjcD+WO1A==
   dependencies:
-    "@alephium/web3" "^0.41.0"
-    "@alephium/web3-wallet" "^0.41.0"
+    "@alephium/web3" "^1.5.2"
+    "@alephium/web3-wallet" "^1.5.2"
 
-"@alephium/web3-wallet@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@alephium/web3-wallet/-/web3-wallet-0.41.0.tgz#3db5833e4dae292e29161bd0a2d2d0345993ae1f"
-  integrity sha512-3EakOJMUspSuPAZBi1Hh77Rn//viG9fE8mReyzGKwyW9S8ucx29LdrxXphQtH03LrAXdC1Rfd+iUET3ikV9oug==
+"@alephium/web3-wallet@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@alephium/web3-wallet/-/web3-wallet-1.5.2.tgz#d8111a5111623a85b2b3ac5280ce95756dee77bb"
+  integrity sha512-BIGmV1nfvj3/HH33/4YeYKDvNNboXkp2//wMFibhfXXCphRgRS/ghAmMRod35uBPb7LCHVjQOen4LGDNcgVyTQ==
   dependencies:
-    "@alephium/web3" "^0.41.0"
+    "@alephium/web3" "^1.5.2"
     "@noble/secp256k1" "1.7.1"
     "@types/node" "^16.18.23"
     bip32 "3.1.0"
     bip39 "3.0.4"
-    buffer "^6.0.3"
     elliptic "6.5.4"
     fs-extra "10.0.1"
 
-"@alephium/web3@^0.41.0":
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/@alephium/web3/-/web3-0.41.0.tgz#bff7ab671f667b0135b96e39069b189e829f8924"
-  integrity sha512-DKNrnC5dGd9HRfBSS7h8Qz0Hn/opPD/G9E2te1eilO3kpsf+oGi9BoZiG/abj98CbDJut8mW9UnNkdrvFwIyiQ==
+"@alephium/web3@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@alephium/web3/-/web3-1.5.2.tgz#d311005b0773146f4db46a0f98edb28975462702"
+  integrity sha512-H5fzL64F4uw7BshR+MfBXa118vTGgESA0rkc5PS93Ign4O0rvUx4CMt6Uy+E7Fqk2+oaZViMiB5rueM9DECwtw==
   dependencies:
     "@noble/secp256k1" "1.7.1"
     base-x "4.0.0"
     bignumber.js "^9.1.1"
-    binary-parser "2.2.1"
     blakejs "1.2.1"
     bn.js "5.2.1"
-    buffer "^6.0.3"
     cross-fetch "^3.1.5"
     crypto-browserify "^3.12.0"
     elliptic "6.5.4"
@@ -1590,11 +1587,6 @@ bignumber.js@^9.1.1:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.2.tgz#b7c4242259c008903b13707983b5f4bbd31eda0c"
   integrity sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==
 
-binary-parser@2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/binary-parser/-/binary-parser-2.2.1.tgz#4edc6da2dc56db73fa5ba450dfe6382ede8294ce"
-  integrity sha512-5ATpz/uPDgq5GgEDxTB4ouXCde7q2lqAQlSdBRQVl/AJnxmQmhIfyxJx+0MGu//D5rHQifkfGbWWlaysG0o9NA==
-
 bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
@@ -1828,14 +1820,6 @@ buffer@^5.5.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 bytes@3.1.2:
   version "3.1.2"
@@ -3025,7 +3009,7 @@ iconv-lite@^0.6.2:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-ieee754@^1.1.13, ieee754@^1.2.1:
+ieee754@^1.1.13:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.2.1.tgz#8eb7a10a63fff25d15a57b001586d177d1b0d352"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==

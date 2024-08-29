@@ -1,0 +1,17 @@
+TxScript DeployNewBet(deploy: DeployBets, title: ByteVec,choicesName: [ByteVec;10], endTimestamp: U256, claimedByAnyoneTimestamp: U256, endBeforeEnd: Bool, tokenIdToVote: ByteVec, tokenIdToHodl: ByteVec, amountToHodl: U256) {
+
+   let caller = callerAddress!()
+
+   deploy.deployBet{caller -> ALPH: minimalContractDeposit!()}(
+      title,
+      choicesName,
+      endTimestamp,
+      claimedByAnyoneTimestamp,
+      endBeforeEnd,
+      tokenIdToVote,
+      tokenIdToHodl,
+      amountToHodl
+   )
+
+
+}

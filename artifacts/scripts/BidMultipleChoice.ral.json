@@ -1,0 +1,40 @@
+{
+  "version": "v3.6.0",
+  "name": "BidMultipleChoice",
+  "bytecodeTemplate": "010103000100404db41700{3}cd41{2}0c321a4c0a1600{4}a2{4}{5}0e0c{0}01094a4039{3}cd41{2}0c331a4c0e16007a{4}a2{1}{2}a3{4}{5}0e0c{0}01094a4023{2}0c334c1216007a7ad1a2{3}{4}a3{1}{2}a3{4}{5}0e0c{0}01094a0d16007ad1a2{3}{4}a3{4}{5}0e0c{0}0109",
+  "fieldsSig": {
+    "names": [
+      "predict",
+      "tokenIdToHodl",
+      "amountHodl",
+      "tokenIdToVote",
+      "amount",
+      "side"
+    ],
+    "types": [
+      "MultipleChoice",
+      "ByteVec",
+      "U256",
+      "ByteVec",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "functions": [
+    {
+      "name": "main",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ]
+}

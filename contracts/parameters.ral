@@ -1,7 +1,0 @@
-TxScript NewInterval(predict: PredictPrice, newRecurrence: U256){
-    predict.setNewRepeatEvery(newRecurrence)
-}
-
-TxScript NewIntervalChoice(predict: PredictChoice, newRecurrence: U256){
-   predict.setNewRepeatEvery(newRecurrence)
-}

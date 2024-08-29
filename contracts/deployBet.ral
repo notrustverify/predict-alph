@@ -1,0 +1,63 @@
+Contract DeployBets(
+   predictionTemplateId: ByteVec,
+   punterChoiceTemplateId: ByteVec, 
+   mut contractIndex: U256
+) {
+   event NewBetDeployed(contractId: ByteVec, deployedFrom: Address, index: U256)
+   event BetDeleted(contractId: ByteVec, deletedBy: Address, index: U256)
+
+
+   enum ErrorCodes {
+      InvalidCaller = 1
+   }
+
+   @using(preapprovedAssets = true, updateFields = true, checkExternalCaller = false)
+   pub fn deployBet(title: ByteVec, choicesName: [ByteVec;10], endTimestamp: U256, claimedByAnyoneTimestamp: U256, endBeforeEnd: Bool, tokenIdToVote: ByteVec, tokenIdToHodl: ByteVec, amountToHodl: U256) -> (){
+      let caller = callerAddress!()
+
+      let (encodedImmFields, encodedMutFields) = MultipleChoice.encodeFields!(
+         selfContractId!(),
+         punterChoiceTemplateId,
+         endTimestamp,
+         caller,
+         claimedByAnyoneTimestamp,
+         endBeforeEnd, // can end round before real end,
+         title,
+         contractIndex,
+         choicesName,
+         tokenIdToVote,
+         tokenIdToHodl,
+         amountToHodl,
+         false, //mut rewardsComputed: Bool,
+         0, //mut totalAmountBoost: U256,
+         0,//mut sideWon: U256,
+         0,//mut totalAmount: U256,
+         [0;10],//mut amountPunters: [U256;10],
+         0, //mut rewardAmount: U256,
+         0, //mut rewardBaseCalAmount: U256,
+         0 //mut counterAttendees: U256
+      )
+
+
+      let betContractId = copyCreateSubContract!{caller -> ALPH: minimalContractDeposit!()}(toByteVec!(contractIndex), predictionTemplateId,encodedImmFields, encodedMutFields)
+
+      emit NewBetDeployed(betContractId, caller, contractIndex)
+      contractIndex = contractIndex + 1
+
+   }
+
+   @using(checkExternalCaller = true, updateFields = true)
+   pub fn deleteBet(contractIndexToDelete: U256, deletor: Address) -> (){
+      let caller = callerContractId!()
+      let betContractId = subContractId!(toByteVec!(contractIndexToDelete))
+
+      checkCaller!(betContractId == caller, ErrorCodes.InvalidCaller)
+
+      emit BetDeleted(betContractId, deletor, contractIndexToDelete)
+
+      contractIndex = contractIndex - 1
+
+   }
+
+}
+

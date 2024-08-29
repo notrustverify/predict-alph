@@ -2,12 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export * from "./PredictChoice";
-export * from "./PredictMultipleChoice";
-export * from "./PredictPrice";
-export * from "./Punter";
+export * from "./DeployBets";
+export * from "./MultipleChoice";
 export * from "./PunterChoice";
-export * from "./Round";
-export * from "./RoundChoice";
-export * from "./RoundMultipleChoice";
 export * from "./scripts";

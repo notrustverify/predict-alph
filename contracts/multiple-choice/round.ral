@@ -1,21 +1,28 @@
-Contract RoundMultipleChoice(
-   prediction: PredictMultipleChoice,
-   epoch: U256,
-   feesBasisPts: U256,
-   bidEndTimestamp: U256,
+Contract MultipleChoice(
+   betManager: ByteVec,
+   punterTemplateId: ByteVec,
+   endTimestamp: U256,
    operator: Address,
-   endBeforeEnd: Bool,
+   claimedByAnyoneDelay: U256,
+   endBeforeEnd: Bool, // can end round before real end,
+   title: ByteVec,
+   contractIndex: U256,
+   choicesName: [ByteVec;10],
+   tokenIdToVote: ByteVec,
+   tokenIdToHodl: ByteVec,
+   amountToHodl: U256,
    mut rewardsComputed: Bool,
    mut totalAmountBoost: U256,
    mut sideWon: U256,
    mut totalAmount: U256,
    mut amountPunters: [U256;10],
-   mut treasuryAmount: U256,
    mut rewardAmount: U256,
    mut rewardBaseCalAmount: U256,
    mut counterAttendees: U256
 ){
 
+   event Bet(contractId: ByteVec, from: Address, amount: U256, side: U256, claimedByAnyoneTimestamp: U256)
+   event Claimed(contractId: ByteVec, punterAddress: Address, from: Address, amount: U256)
 
    enum ErrorCodes {
       InvalidCaller = 100
@@ -23,97 +30,197 @@ Contract RoundMultipleChoice(
       RewardsAlreadyComputed = 103
       BidTimestampNotReached = 104
       RewardsNotComputed  = 105
+      PunterChoiceNotExists = 106
+      BidTimestampReached = 107
+      InvalidPunterChoiceAddress = 108
+      NotEnoughAlph = 109
+      AlreadyPlayed = 110
+      CannotBeClaimedYet = 111
+      NotEnoughTokenHodling  = 112
    }
 
 
-   pub fn getEndRoundTime() -> (U256) {
-      return bidEndTimestamp
-   }
-
-   pub fn getRewardAmount() -> (U256) {
-      return treasuryAmount
-   }
-
-   pub fn getRewardBaseCalAmount() -> (U256){
-      return rewardBaseCalAmount
+   enum SubContractTypes {
+      PunterChoice = #00
    }
 
 
-   pub fn getRoundEpoch() -> (U256){
-      return epoch
+   fn getBetInfo(from: Address) -> PunterChoice {
+      let bidderContractId = subContractId!(SubContractTypes.PunterChoice ++ toByteVec!(from))
+      assert!(contractExists!(bidderContractId), ErrorCodes.PunterChoiceNotExists)
+   
+      return PunterChoice(bidderContractId)
    }
-
-   pub fn canEndBeforeEnd() -> (Bool){
-      return endBeforeEnd
-   }
-
 
    @using(updateFields = true, assetsInContract = true, preapprovedAssets = true)
-   pub fn updateAmount(from: Address, amount: U256, side: U256) -> () {
-      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+   fn updateAmount(from: Address, amount: U256, side: U256) -> () {
+      checkCaller!(callerContractId!() == selfContractId!(), ErrorCodes.InvalidCaller)
       assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
 
       totalAmount = totalAmount + amount
       amountPunters[side] = amountPunters[side] + amount
 
-      counterAttendees = counterAttendees + 1
-      transferTokenToSelf!(from, ALPH, amount)
-   }
+      transferTokenToSelf!(from, tokenIdToVote, amount)
+      if(tokenIdToVote != ALPH){
+         transferTokenToSelf!(from, ALPH, 0.01 alph)
 
-   @using(updateFields = true, checkExternalCaller = false)
-   pub fn calculateRewards(sideWinning: U256) -> (){
-      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-      if(!endBeforeEnd){
-         assert!(bidEndTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
       }
-
-      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
-
-      rewardBaseCalAmount = amountPunters[sideWinning]
-         
-      treasuryAmount = totalAmount * feesBasisPts/10000
-      rewardAmount = totalAmount - treasuryAmount
-
-      sideWon = sideWinning
-      rewardsComputed = true
-   }
-
-
-   // add more rewards toward a side to incentive people to play
-   @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
-   pub fn boost(from: Address, amount: U256) -> (){
-      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
-
-      totalAmountBoost = totalAmountBoost + amount
-      totalAmount = totalAmount + amount
-      
-      transferTokenToSelf!(from, ALPH, amount)
-
-   }
-
-   @using(assetsInContract = true)
-   pub fn destroy() -> (){
-      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
-      assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
-
-      destroySelf!(operator)
    }
 
    @using(updateFields = true, assetsInContract = true)
-   pub fn userClaimRewards(addressPunter: Address, amountBid: U256, sideBid: U256) -> (){
-      checkCaller!(callerContractId!() == contractId!(prediction), ErrorCodes.InvalidCaller)
+   fn userClaimRewards(addressPunter: Address, amountBid: U256, sideBid: U256) -> (){
       assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
 
       // reward < 0 means that house won, price was equal
       if (rewardAmount > 0) {
          if(sideWon == sideBid){
                let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
+               transferTokenFromSelf!(addressPunter, tokenIdToHodl, userReward)
 
-               transferTokenFromSelf!(addressPunter, ALPH, userReward)
                totalAmount = totalAmount - userReward
          }
       }
-      counterAttendees = counterAttendees - 1
    }
+
+   @using(updateFields = true, checkExternalCaller = false)
+   pub fn calculateRewards(sideWinning: U256) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      if(!endBeforeEnd){
+         assert!(endTimestamp <= blockTimeStamp!(), ErrorCodes.BidTimestampNotReached)
+      }
+
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      rewardBaseCalAmount = amountPunters[sideWinning]
+         
+      rewardAmount = totalAmount
+
+      sideWon = sideWinning
+      rewardsComputed = true
+   }
+
+   pub fn getEndRoundTime() -> (U256) {
+      return endTimestamp
+   }
+
+   pub fn getRewardBaseCalAmount() -> (U256){
+      return rewardBaseCalAmount
+   }
+
+   pub fn getTitle() -> (ByteVec){
+      return title
+   }
+
+   pub fn getChoicesName() -> ([ByteVec;10]){
+      return choicesName
+   }
+
+   pub fn canEndBeforeEnd() -> (Bool){
+      return endBeforeEnd
+   }
+
+   @using(preapprovedAssets = true, checkExternalCaller = false, updateFields = true)
+   pub fn bid(amount: U256, side: U256) -> (){
+      let caller = callerAddress!()
+
+      let timestampNow = blockTimeStamp!()
+      assert!(timestampNow < endTimestamp, ErrorCodes.BidTimestampReached)
+      assert!(isAssetAddress!(caller), ErrorCodes.InvalidPunterChoiceAddress)
+      assert!(amount >= minimalContractDeposit!(), ErrorCodes.NotEnoughAlph)
+
+      // use address for th path to be able to find it back 
+      let bidderContractId = SubContractTypes.PunterChoice ++ toByteVec!(caller)
+
+      // user never played, create contract
+      assert!(!contractExists!(subContractId!(bidderContractId)), ErrorCodes.AlreadyPlayed)
+      
+      let mut bidAmount = amount
+      if(tokenIdToVote == ALPH){
+         bidAmount = amount - minimalContractDeposit!()
+      }
+
+      let mut claimedByAnyoneTimestamp = 0
+      if(claimedByAnyoneDelay >= timestampNow){
+         claimedByAnyoneTimestamp = claimedByAnyoneDelay
+      }else{
+         claimedByAnyoneTimestamp = timestampNow + claimedByAnyoneDelay
+      }
+
+      let selfContractId = selfContractId!()
+      let (encodedImmFields, encodedMutFields) = PunterChoice.encodeFields!(selfContractId, caller, side, bidAmount, claimedByAnyoneTimestamp)
+      let _ = copyCreateSubContract!{caller -> ALPH: minimalContractDeposit!()}(bidderContractId, punterTemplateId, encodedImmFields, encodedMutFields)
+
+      if(amountToHodl > 0){
+         let tokenHodling = tokenRemaining!(caller, tokenIdToHodl)
+         assert!(tokenHodling >= amountToHodl, ErrorCodes.NotEnoughTokenHodling)
+      }
+
+      updateAmount{caller -> tokenIdToVote: bidAmount}(caller, bidAmount, side)
+
+      counterAttendees = counterAttendees + 1
+
+      emit Bet(selfContractId, caller, amount, side, claimedByAnyoneTimestamp)
+
+   }
+
+   @using(checkExternalCaller = false, updateFields = true)
+   pub fn claim(addressToClaim: Address) -> () {
+      let caller = callerAddress!()
+      let timestampNow = blockTimeStamp!()
+      let selfContractId = selfContractId!()
+
+      let betInfoContractId = subContractId!(SubContractTypes.PunterChoice ++ toByteVec!(addressToClaim))
+      assert!(contractExists!(betInfoContractId), ErrorCodes.PunterChoiceNotExists)
+
+      let betInfoCaller = getBetInfo(addressToClaim)
+            
+      let addressPunterChoice = betInfoCaller.getAddress()
+      let canBeClaimedAt = betInfoCaller.getClaimedByAnyone()
+            
+      if(addressToClaim != caller){
+         assert!(timestampNow > canBeClaimedAt, ErrorCodes.CannotBeClaimedYet)
+      }
+
+      let amountPunterChoice = betInfoCaller.getAmountBid()
+      let upBid = betInfoCaller.getBid()
+
+      // cannot claim if the round didnt end 
+      userClaimRewards(addressToClaim, amountPunterChoice, upBid)
+      betInfoCaller.destroy(caller)
+
+
+      counterAttendees = counterAttendees - 1
+
+      // emit who call and with and which punter it concerned
+      emit Claimed(selfContractId, addressPunterChoice, caller, amountPunterChoice)
+
+   }
+
+
+   // add more rewards toward a side to incentive people to play
+   @using(assetsInContract = true, checkExternalCaller = false, preapprovedAssets = true, updateFields = true)
+   pub fn boost(amount: U256) -> (){
+      let caller = callerAddress!()
+      assert!(!rewardsComputed, ErrorCodes.RewardsAlreadyComputed)
+
+      totalAmountBoost = totalAmountBoost + amount
+      totalAmount = totalAmount + amount
+      
+      transferTokenToSelf!(caller, tokenIdToVote, amount)
+
+   }
+
+   @using(assetsInContract = true)
+   pub fn destroy() -> (){
+      let caller = callerAddress!()
+      checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
+      assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
+
+      DeployBets(betManager).deleteBet(contractIndex, caller)
+
+      destroySelf!(operator)
+   }
+
+   
 
 }

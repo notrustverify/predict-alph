@@ -1,48 +1,34 @@
 import {
+  ALPH_TOKEN_ID,
   Address,
   DUST_AMOUNT,
+  ExecuteScriptParams,
+  MINIMAL_CONTRACT_DEPOSIT,
   ONE_ALPH,
   SignerProvider,
   binToHex,
   groupOfAddress,
+  stringToHex,
+  subContractId,
   web3,
 } from "@alephium/web3";
 import {
-  PredictPrice,
-  PredictChoice,
-  Round,
-  Punter,
-  PredictPriceInstance,
-  RoundInstance,
-  PunterInstance,
-  Start,
-  End,
-  BidPrice,
-  WithdrawPrice,
-  DestroyRound,
-  BoostRound,
-  PredictChoiceInstance,
-  BidChoice,
-  WithdrawChoice,
-  StartChoice,
-  EndChoice,
-  RoundChoice,
-  BoostRoundChoice,
-  PunterChoice,
-  RoundMultipleChoice,
-  PredictMultipleChoice,
-  PredictMultipleChoiceInstance,
   BidMultipleChoice,
-  BoostRoundMultipleChoice,
-  WithdrawMultipleChoice,
-  DestroyRoundMultipleChoice,
-  EndMultipleChoice,
-  DestroyPredict,
-  RoundMultipleChoiceTypes,
+  BoostBet,
+  ClaimMultipleChoice,
+  DeployBets,
+  DeployBetsInstance,
+  DeployNewBet,
+  DestroyBet,
+  EndBet,
+  MultipleChoice,
+  MultipleChoiceInstance,
+  MultipleChoiceTypes,
+  PunterChoice,
 } from "../artifacts/ts";
 import { PrivateKeyWallet } from "@alephium/web3-wallet";
 import { testAddress, testPrivateKey } from "@alephium/web3-test";
-import { waitTxConfirmed as _waitTxConfirmed } from "@alephium/cli";
+import { waitForTxConfirmation as _waitTxConfirmed } from "@alephium/web3";
 
 web3.setCurrentNodeProvider("http://127.0.0.1:22973", undefined, fetch);
 export const ZERO_ADDRESS = "tgx7VNFoP9DJiFMFgXXtafQZkUvyEdDHT9ryamHJYrjq";
@@ -52,109 +38,47 @@ export const defaultSigner = new PrivateKeyWallet({
 
 const isType = <Type>(thing: any): thing is Type => true;
 
-export async function deployPrediction(
-  operator: Address,
-  repeatEverySecond: number,
-  epoch: bigint,
-  title: string
-) {
-  const punterTemplateId = await deployPunterTemplate();
-  const roundTemplateId = await deployRoundTemplate();
-  return await PredictPrice.deploy(defaultSigner, {
+export async function deployBets() {
+  const punterTemplateId = await deployPunterMultipleChoiceTemplate();
+  const betTemplateId = await deployBetTemplate();
+  return await DeployBets.deploy(defaultSigner, {
     initialFields: {
-      punterTemplateId: punterTemplateId.contractInstance.contractId,
-      roundTemplateId: roundTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: BigInt(1 * 1000),
-      title: binToHex(new TextEncoder().encode(title)),
-      playerCounter: 0n,
+      predictionTemplateId: betTemplateId.contractInstance.contractId,
+      punterChoiceTemplateId: punterTemplateId.contractInstance.contractId,
+      contractIndex: 0n,
     },
   });
 }
 
-export async function deployPredictionChoice(
-  operator: Address,
-  repeatEverySecond: number,
-  epoch: bigint,
-  title: string,
-  endBeforeEnd: boolean
-) {
-  const punterTemplateId = await deployPunterTemplate();
-  const roundTemplateId = await deployRoundChoiceTemplate();
-  return await PredictChoice.deploy(defaultSigner, {
+export async function deployBetTemplate() {
+  return await MultipleChoice.deploy(defaultSigner, {
     initialFields: {
-      punterTemplateId: punterTemplateId.contractInstance.contractId,
-      roundTemplateId: roundTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: BigInt(1 * 1000),
-      title: binToHex(new TextEncoder().encode(title)),
-      playerCounter: 0n,
-      endBeforeEnd: endBeforeEnd,
-    },
-  });
-}
-
-export async function deployPunterTemplate() {
-  return await Punter.deploy(defaultSigner, {
-    initialFields: {
-      predictionContractId: "00",
-      punterAddress: ZERO_ADDRESS,
-      epoch: 0n,
-      side: false,
-      amountBid: 0n,
-      claimedByAnyoneAt: 0n,
-    },
-  });
-}
-
-export async function deployRoundTemplate() {
-  return await Round.deploy(defaultSigner, {
-    initialFields: {
-      prediction: "00",
-      epoch: 0n,
-      priceStart: 0n,
-      feesBasisPts: 0n,
-      bidEndTimestamp: 0n,
+      punterTemplateId: "00",
+      endTimestamp: 0n,
       operator: ZERO_ADDRESS,
-      rewardsComputed: false,
-      priceEnd: 0n,
-      totalAmount: 0n,
-      amountUp: 0n,
-      amountDown: 0n,
-      treasuryAmount: 0n,
-      rewardAmount: 0n,
-      rewardBaseCalAmount: 0n,
-      counterAttendees: 0n,
-      totalAmountBoost: 0n,
-    },
-  });
-}
-
-export async function deployRoundChoiceTemplate() {
-  return await RoundChoice.deploy(defaultSigner, {
-    initialFields: {
-      prediction: "00",
-      epoch: 0n,
-      feesBasisPts: 0n,
-      bidEndTimestamp: 0n,
-      operator: ZERO_ADDRESS,
-      rewardsComputed: false,
-      totalAmount: 0n,
-      treasuryAmount: 0n,
-      rewardAmount: 0n,
-      rewardBaseCalAmount: 0n,
-      counterAttendees: 0n,
-      totalAmountBoost: 0n,
-      sideWon: false,
-      amountTrue: 0n,
-      amountFalse: 0n,
+      claimedByAnyoneDelay: 0n,
       endBeforeEnd: false,
+      title: "",
+      choicesName: Array.from(
+        Array(10),
+        () => "00"
+      ) as MultipleChoiceTypes.Fields["choicesName"],
+      rewardsComputed: false,
+      totalAmountBoost: 0n,
+      sideWon: 0n,
+      totalAmount: 0n,
+      amountPunters: Array.from(
+        Array(10),
+        () => 0n
+      ) as MultipleChoiceTypes.Fields["amountPunters"],
+      rewardAmount: 0n,
+      rewardBaseCalAmount: 0n,
+      counterAttendees: 0n,
+      betManager: "",
+      contractIndex: 0n,
+      tokenIdToVote: "00",
+      tokenIdToHodl: "00",
+      amountToHodl: 0n,
     },
   });
 }
@@ -164,7 +88,6 @@ export async function deployPunterMultipleChoiceTemplate() {
     initialFields: {
       predictionContractId: "00",
       punterAddress: ZERO_ADDRESS,
-      epoch: 0n,
       side: 0n,
       amountBid: 0n,
       claimedByAnyoneAt: 0n,
@@ -172,283 +95,144 @@ export async function deployPunterMultipleChoiceTemplate() {
   });
 }
 
-export async function deployRoundMultipleChoiceTemplate() {
-  return await RoundMultipleChoice.deploy(defaultSigner, {
-    initialFields: {
-      prediction: "00",
-      epoch: 0n,
-      feesBasisPts: 0n,
-      bidEndTimestamp: 0n,
-      operator: ZERO_ADDRESS,
-      rewardsComputed: false,
-      totalAmount: 0n,
-      treasuryAmount: 0n,
-      rewardAmount: 0n,
-      rewardBaseCalAmount: 0n,
-      counterAttendees: 0n,
-      totalAmountBoost: 0n,
-      endBeforeEnd: false,
-      sideWon: 0n,
-      amountPunters: Array.from(Array(10), () => 0n) as RoundMultipleChoiceTypes.Fields["amountPunters"],
-    },
-  });
-}
-
-export async function deployPredictionMultipleChoice(
-  operator: Address,
-  repeatEverySecond: number,
-  epoch: bigint,
+export async function deployNewBet(
+  signer: SignerProvider,
+  predict: DeployBetsInstance,
   title: string,
-  endBeforeEnd: boolean
+  choicesName: MultipleChoiceTypes.Fields["choicesName"],
+  endTimestamp: bigint,
+  claimedByAnyoneTimestamp: bigint,
+  endBeforeEnd: boolean,
+  tokenIdToVote: string,
+  tokenIdToHodl: string,
+  amountToHodl: bigint
 ) {
-  const punterMultipleChoiceTemplateId =
-    await deployPunterMultipleChoiceTemplate();
-  const roundMultipleChoiceTemplateId =
-    await deployRoundMultipleChoiceTemplate();
-
-  return await PredictMultipleChoice.deploy(defaultSigner, {
+  return await DeployNewBet.execute(signer, {
     initialFields: {
-      punterTemplateId:
-        punterMultipleChoiceTemplateId.contractInstance.contractId,
-      roundTemplateId:
-        roundMultipleChoiceTemplateId.contractInstance.contractId,
-      epoch: epoch,
-      operator: operator,
-      feesBasisPts: 100n,
-      repeatEvery: BigInt(repeatEverySecond * 1000),
-      claimedByAnyoneDelay: BigInt(1 * 1000),
-      title: binToHex(new TextEncoder().encode(title)),
-      playerCounter: 0n,
+      deploy: predict.contractId,
+      title: title,
+      choicesName: choicesName,
+      endTimestamp: endTimestamp,
+      claimedByAnyoneTimestamp: claimedByAnyoneTimestamp,
       endBeforeEnd: endBeforeEnd,
+      tokenIdToVote: tokenIdToVote,
+      tokenIdToHodl: tokenIdToHodl,
+      amountToHodl: amountToHodl,
     },
+    attoAlphAmount: 1n * ONE_ALPH + DUST_AMOUNT,
   });
-}
-
-export async function startRound(
-  signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
-  price: bigint
-) {
-  if (predict instanceof PredictPriceInstance) {
-    return await Start.execute(signer, {
-      initialFields: { predict: predict.contractId, price: price },
-      attoAlphAmount: ONE_ALPH,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await StartChoice.execute(signer, {
-      initialFields: { predict: predict.contractId },
-      attoAlphAmount: ONE_ALPH,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await StartChoice.execute(signer, {
-      initialFields: { predict: predict.contractId },
-      attoAlphAmount: ONE_ALPH,
-    });
-  }
-}
-
-export async function endRound(
-  signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
-  price: bigint,
-  immediatelyStart: boolean,
-  sideWon: boolean | bigint
-) {
-  if (predict instanceof PredictPriceInstance) {
-    return await End.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        price: price,
-        immediatelyStart: immediatelyStart,
-      },
-      attoAlphAmount: ONE_ALPH,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await EndChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        sideWon: sideWon as boolean,
-        immediatelyStart: immediatelyStart,
-      },
-      attoAlphAmount: ONE_ALPH,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await EndMultipleChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        sideWon: sideWon as bigint,
-        immediatelyStart: immediatelyStart,
-      },
-      attoAlphAmount: ONE_ALPH,
-    });
-  }
 }
 
 export async function bid(
   signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
+  predict: MultipleChoiceInstance,
   amount: bigint,
-  up: boolean | bigint
+  side: bigint,
+  tokenIdToHodl: string,
+  amountHodl: bigint,
+  tokenIdToVote: string
 ) {
-  if (predict instanceof PredictPriceInstance) {
-    return await BidPrice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        amount: amount,
-        side: up as boolean,
+  let data = {
+    initialFields: {
+      predict: predict.contractId,
+      amount: amount,
+      side: side as bigint,
+      tokenIdToHodl: tokenIdToHodl,
+      amountHodl: amountHodl,
+      tokenIdToVote: tokenIdToVote},
+
+      attoAlphAmount: 0n,
+      tokens: [{ id: "", amount: 0n }],
+    }
+  
+
+  if (tokenIdToVote == ALPH_TOKEN_ID && tokenIdToHodl == ALPH_TOKEN_ID) {
+    data.attoAlphAmount = amount + 2n * DUST_AMOUNT+amountHodl;
+    data.tokens = []
+
+  } else if (
+    tokenIdToHodl !== ALPH_TOKEN_ID &&
+    tokenIdToVote != ALPH_TOKEN_ID
+  ) {
+    data.attoAlphAmount =
+      MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
+    data.tokens = [
+      {
+        id: tokenIdToHodl,
+        amount: amountHodl,
       },
-      attoAlphAmount: amount + 2n * DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await BidChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        amount: amount,
-        side: up as boolean,
+      { id: tokenIdToVote, amount: amount },
+    ];
+  } else if (tokenIdToHodl == ALPH_TOKEN_ID && tokenIdToVote != ALPH_TOKEN_ID) {
+    data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
+    data.tokens = [
+      {
+        id: tokenIdToHodl,
+        amount: amountHodl,
       },
-      attoAlphAmount: amount + 2n * DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await BidMultipleChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        amount: amount,
-        side: up as bigint,
-      },
-      attoAlphAmount: amount + 2n * DUST_AMOUNT,
-    });
+    ];
+  } else {
+   data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
+   data.tokens = []
+  }
+
+  if (predict instanceof MultipleChoiceInstance) {
+    return await BidMultipleChoice.execute(signer, data);
   }
 }
 
-export async function withdraw(
+export async function claim(
   signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
-  epochParticipation: string,
+  predict: MultipleChoiceInstance,
   addressToClaim: string
 ) {
-  if (predict instanceof PredictPriceInstance) {
-    return await WithdrawPrice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        epochParticipation,
-        addressToClaim: addressToClaim,
-      },
-      attoAlphAmount: DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await WithdrawChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        epochParticipation,
-        addressToClaim: addressToClaim,
-      },
-      attoAlphAmount: 2n * DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await WithdrawMultipleChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        epochParticipation,
-        addressToClaim: addressToClaim,
-      },
-      attoAlphAmount: 2n * DUST_AMOUNT,
-    });
-  }
+  return await ClaimMultipleChoice.execute(signer, {
+    initialFields: {
+      predict: predict.contractId,
+      addressToClaim: addressToClaim,
+    },
+    attoAlphAmount: 2n * DUST_AMOUNT,
+  });
 }
 
-export async function destroyRound(
+export async function destroyBet(
   signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
-  epochArray
+  predict: MultipleChoiceInstance
 ) {
-  if (predict instanceof PredictPriceInstance) {
-    return await DestroyRound.execute(signer, {
+  if (predict instanceof MultipleChoiceInstance) {
+    return await DestroyBet.execute(signer, {
       initialFields: {
-        predict: predict.contractId,
-        arrayEpoch: epochArray,
-      },
-      attoAlphAmount: DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await DestroyRound.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        arrayEpoch: epochArray,
-      },
-      attoAlphAmount: DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await DestroyRoundMultipleChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        arrayEpoch: epochArray,
+        bet: predict.contractId,
       },
       attoAlphAmount: DUST_AMOUNT,
     });
   }
 }
 
-export async function destroyPredict(
+export async function endBet(
   signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance
+  bet: MultipleChoiceInstance,
+  sideWon: bigint
 ) {
-  return await DestroyPredict.execute(signer, {
-    initialFields: { predict: predict.contractId },
+  return await EndBet.execute(signer, {
+    initialFields: {
+      bet: bet.contractId,
+      sideWon: sideWon,
+    },
+    attoAlphAmount: DUST_AMOUNT,
   });
 }
 
 export async function boostRound(
   signer: SignerProvider,
-  predict:
-    | PredictPriceInstance
-    | PredictChoiceInstance
-    | PredictMultipleChoiceInstance,
-  epoch: bigint,
-  amount: bigint,
-  up: boolean
+  predict: MultipleChoiceInstance,
+  amount: bigint
 ) {
-  if (predict instanceof PredictPriceInstance) {
-    return await BoostRound.execute(signer, {
+  if (predict instanceof MultipleChoiceInstance) {
+    return await BoostBet.execute(signer, {
       initialFields: {
         predict: predict.contractId,
         amount: amount,
-        epochToBoost: epoch,
-      },
-      attoAlphAmount: amount + DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictChoiceInstance) {
-    return await BoostRoundChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        amount: amount,
-        epochToBoost: epoch,
-      },
-      attoAlphAmount: amount + DUST_AMOUNT,
-    });
-  } else if (predict instanceof PredictMultipleChoiceInstance) {
-    return await BoostRoundMultipleChoice.execute(signer, {
-      initialFields: {
-        predict: predict.contractId,
-        amount: amount,
-        epochToBoost: epoch,
       },
       attoAlphAmount: amount + DUST_AMOUNT,
     });
@@ -459,7 +243,7 @@ async function waitTxConfirmed<T extends { txId: string }>(
   promise: Promise<T>
 ): Promise<T> {
   const result = await promise;
-  await _waitTxConfirmed(web3.getCurrentNodeProvider(), result.txId, 1, 1000);
+  await _waitTxConfirmed(result.txId, 1, 1000);
   return result;
 }
 
@@ -490,3 +274,30 @@ export function arrayEpochToBytes(arrayEpoch) {
   arrayEpoch.forEach((value, index) => buffer.writeUInt32BE(value, index * 4));
   return buffer.toString("hex");
 }
+
+export function fillArray(
+  arr: string[],
+  targetLength: number,
+  fillValue: string
+) {
+  // Create a new array with the provided elements
+  const result = arr.map((ele) => stringToHex(ele));
+
+  // Calculate the number of elements to fill
+  const elementsToFill = targetLength - result.length;
+
+  // Fill the remaining elements
+  for (let i = 0; i < elementsToFill; i++) {
+    result.push(fillValue);
+  }
+
+  return result as MultipleChoiceTypes.Fields["choicesName"];
+}
+
+export const alphBalanceOf = async (address: string): Promise<bigint> => {
+  const balances = await web3
+    .getCurrentNodeProvider()
+    .addresses.getAddressesAddressBalance(address);
+  const balance = balances.balance;
+  return balance === undefined ? 0n : BigInt(balance);
+};

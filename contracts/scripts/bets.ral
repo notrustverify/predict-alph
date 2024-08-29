@@ -1,0 +1,7 @@
+TxScript DestroyBet(bet: MultipleChoice){
+   bet.destroy()
+}
+
+TxScript EndBet(bet: MultipleChoice, sideWon: U256){
+   bet.calculateRewards(sideWon)
+}

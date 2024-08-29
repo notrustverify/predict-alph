@@ -1,0 +1,374 @@
+{
+  "version": "v3.6.0",
+  "name": "MultipleChoice",
+  "bytecode": "40260d1a4054408540c340d140df40ed410d411b41da4256428042ac00000102010c14010016004744cb17011601c513406a7b16010200010303004023b3b1411340647ba000191340677ba00316012aa10316027a130a314d102ac316012a16027a130a314d102ac41600ce121601ac000203040019a0001340697ba00e0c334c12a00216022f4c0e1601a00e2ca00f2d17031600ce131603aba00316032ba10301000101004020d3f6d21caab4ce03451340647bce054b05ce0256321340687ba000191340677b16007a130a314d102ac3a10fa003a10e1600a10203a100010000000103d32b301872ce0202010000000103d3f034d088a00f02010000000103d30d9ada66ce0602010000000a0cd3f98aa171ce08ce09ce0ace0bce0cce0dce0ece0fce10ce1102010000000103d303042c51ce05020103020b00406bd36c006f71b417025617031603ce023113406b7b16024813406c7b1600d13413406d7b1401001602474417041604cbc51913406e7b16001705ce12cd414c041600d12b17050c1706ce041603344c03ce0417064a041603ce042a1706b1170716071602160116051606130564130064170917081602d1a21604ce0116081609c118ce140c334c091602ce13a5170a160ace14341340707b1602ce121605a31602160516010001a0100d2aa1100516071602160016011606730100010a004044d371f2f87eb41701561702b1170314010016004744cb17041604c513406a7b1600000017050c0d1605010017060c0d16050103170716001601464c05160216073313406f7b0c0d1605010217080c0d160501011709160016081609000216010d0c16050104a0100d2ba11006160316061601160861010101020013d38578f92bb41701a000191340677ba00116002aa101a00316002aa1031601ce121600ac010200010015d38e18691cb417001600ce03451340647ba0100c321340657bce0716000e0cce000101ce03b0",
+  "codeHash": "ff16557fb814ffbe61e561bfdbfa3157571468999912eb9b39bd52b11fde926f",
+  "fieldsSig": {
+    "names": [
+      "betManager",
+      "punterTemplateId",
+      "endTimestamp",
+      "operator",
+      "claimedByAnyoneDelay",
+      "endBeforeEnd",
+      "title",
+      "contractIndex",
+      "choicesName",
+      "tokenIdToVote",
+      "tokenIdToHodl",
+      "amountToHodl",
+      "rewardsComputed",
+      "totalAmountBoost",
+      "sideWon",
+      "totalAmount",
+      "amountPunters",
+      "rewardAmount",
+      "rewardBaseCalAmount",
+      "counterAttendees"
+    ],
+    "types": [
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "Address",
+      "U256",
+      "Bool",
+      "ByteVec",
+      "U256",
+      "[ByteVec;10]",
+      "ByteVec",
+      "ByteVec",
+      "U256",
+      "Bool",
+      "U256",
+      "U256",
+      "U256",
+      "[U256;10]",
+      "U256",
+      "U256",
+      "U256"
+    ],
+    "isMutable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "eventsSig": [
+    {
+      "name": "Bet",
+      "fieldNames": [
+        "contractId",
+        "from",
+        "amount",
+        "side",
+        "claimedByAnyoneTimestamp"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "Address",
+        "U256",
+        "U256",
+        "U256"
+      ]
+    },
+    {
+      "name": "Claimed",
+      "fieldNames": [
+        "contractId",
+        "punterAddress",
+        "from",
+        "amount"
+      ],
+      "fieldTypes": [
+        "ByteVec",
+        "Address",
+        "Address",
+        "U256"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "getBetInfo",
+      "paramNames": [
+        "from"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": [
+        "PunterChoice"
+      ]
+    },
+    {
+      "name": "updateAmount",
+      "paramNames": [
+        "from",
+        "amount",
+        "side"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "userClaimRewards",
+      "paramNames": [
+        "addressPunter",
+        "amountBid",
+        "sideBid"
+      ],
+      "paramTypes": [
+        "Address",
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "calculateRewards",
+      "paramNames": [
+        "sideWinning"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "getEndRoundTime",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getRewardBaseCalAmount",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "U256"
+      ]
+    },
+    {
+      "name": "getTitle",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "ByteVec"
+      ]
+    },
+    {
+      "name": "getChoicesName",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "[ByteVec;10]"
+      ]
+    },
+    {
+      "name": "canEndBeforeEnd",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": [
+        "Bool"
+      ]
+    },
+    {
+      "name": "bid",
+      "paramNames": [
+        "amount",
+        "side"
+      ],
+      "paramTypes": [
+        "U256",
+        "U256"
+      ],
+      "paramIsMutable": [
+        false,
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "claim",
+      "paramNames": [
+        "addressToClaim"
+      ],
+      "paramTypes": [
+        "Address"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "boost",
+      "paramNames": [
+        "amount"
+      ],
+      "paramTypes": [
+        "U256"
+      ],
+      "paramIsMutable": [
+        false
+      ],
+      "returnTypes": []
+    },
+    {
+      "name": "destroy",
+      "paramNames": [],
+      "paramTypes": [],
+      "paramIsMutable": [],
+      "returnTypes": []
+    }
+  ],
+  "constants": [],
+  "enums": [
+    {
+      "name": "ErrorCodes",
+      "fields": [
+        {
+          "name": "InvalidCaller",
+          "value": {
+            "type": "U256",
+            "value": "100"
+          }
+        },
+        {
+          "name": "NotAllPlayerClaimed",
+          "value": {
+            "type": "U256",
+            "value": "101"
+          }
+        },
+        {
+          "name": "RewardsAlreadyComputed",
+          "value": {
+            "type": "U256",
+            "value": "103"
+          }
+        },
+        {
+          "name": "BidTimestampNotReached",
+          "value": {
+            "type": "U256",
+            "value": "104"
+          }
+        },
+        {
+          "name": "RewardsNotComputed",
+          "value": {
+            "type": "U256",
+            "value": "105"
+          }
+        },
+        {
+          "name": "PunterChoiceNotExists",
+          "value": {
+            "type": "U256",
+            "value": "106"
+          }
+        },
+        {
+          "name": "BidTimestampReached",
+          "value": {
+            "type": "U256",
+            "value": "107"
+          }
+        },
+        {
+          "name": "InvalidPunterChoiceAddress",
+          "value": {
+            "type": "U256",
+            "value": "108"
+          }
+        },
+        {
+          "name": "NotEnoughAlph",
+          "value": {
+            "type": "U256",
+            "value": "109"
+          }
+        },
+        {
+          "name": "AlreadyPlayed",
+          "value": {
+            "type": "U256",
+            "value": "110"
+          }
+        },
+        {
+          "name": "CannotBeClaimedYet",
+          "value": {
+            "type": "U256",
+            "value": "111"
+          }
+        },
+        {
+          "name": "NotEnoughTokenHodling",
+          "value": {
+            "type": "U256",
+            "value": "112"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SubContractTypes",
+      "fields": [
+        {
+          "name": "PunterChoice",
+          "value": {
+            "type": "ByteVec",
+            "value": "00"
+          }
+        }
+      ]
+    }
+  ]
+}

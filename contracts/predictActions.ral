@@ -1,3 +1,0 @@
-TxScript DestroyPredict(predict: PredictChoice) {
-   predict.destroy()
-}
