@@ -240,7 +240,6 @@ class Factory extends ContractFactory<
       PunterChoiceNotExists: BigInt("106"),
       BidTimestampReached: BigInt("107"),
       InvalidPunterChoiceAddress: BigInt("108"),
-      NotEnoughAlph: BigInt("109"),
       AlreadyPlayed: BigInt("110"),
       CannotBeClaimedYet: BigInt("111"),
       NotEnoughTokenHodling: BigInt("112"),
@@ -394,8 +393,8 @@ class Factory extends ContractFactory<
 export const MultipleChoice = new Factory(
   Contract.fromJson(
     MultipleChoiceContractJson,
-    "=41-4=1+0=1-1=3-1+1=3-1+b42d7=579-1+f=269-1+d=14+ce141600160a7e040c416d6f756e7420686f646c20092e20616d6f756e74200a2c20686f646c696e672000=504",
-    "26aa6cd833122f9479d45591000b21cf475524982b55a5856cb43b96e9d83be9",
+    "",
+    "f5748d5b9654c2648f19945d01c4e6c1eab1eeb2d2219c10e8ceb6e70c67ec6d",
     []
   )
 );

@@ -164,11 +164,12 @@ export async function bid(
       { id: tokenIdToVote, amount: amount },
     ];
   } else if (tokenIdToHodl == ALPH_TOKEN_ID && tokenIdToVote != ALPH_TOKEN_ID) {
-    data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
+   
+    data.attoAlphAmount = MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
     data.tokens = [
       {
-        id: tokenIdToHodl,
-        amount: amountHodl,
+        id: tokenIdToVote,
+        amount: amount,
       },
     ];
   } else {

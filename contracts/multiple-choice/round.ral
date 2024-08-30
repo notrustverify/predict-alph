@@ -33,7 +33,7 @@ Contract MultipleChoice(
       PunterChoiceNotExists = 106
       BidTimestampReached = 107
       InvalidPunterChoiceAddress = 108
-      NotEnoughAlph = 109
+    //  NotEnoughAlph = 109
       AlreadyPlayed = 110
       CannotBeClaimedYet = 111
       NotEnoughTokenHodling  = 112
@@ -62,8 +62,7 @@ Contract MultipleChoice(
 
       transferTokenToSelf!(from, tokenIdToVote, amount)
       if(tokenIdToVote != ALPH){
-         transferTokenToSelf!(from, ALPH, 0.01 alph)
-
+         transferTokenToSelf!(from, ALPH, dustAmount!())
       }
    }
 
@@ -126,7 +125,7 @@ Contract MultipleChoice(
       let timestampNow = blockTimeStamp!()
       assert!(timestampNow < endTimestamp, ErrorCodes.BidTimestampReached)
       assert!(isAssetAddress!(caller), ErrorCodes.InvalidPunterChoiceAddress)
-      assert!(amount >= minimalContractDeposit!(), ErrorCodes.NotEnoughAlph)
+      //assert!(amount >= minimalContractDeposit!(), ErrorCodes.NotEnoughAlph)
 
       // use address for th path to be able to find it back 
       let bidderContractId = SubContractTypes.PunterChoice ++ toByteVec!(caller)
@@ -155,8 +154,13 @@ Contract MultipleChoice(
          assert!(tokenHodling >= amountToHodl, ErrorCodes.NotEnoughTokenHodling)
       }
 
-      updateAmount{caller -> tokenIdToVote: bidAmount}(caller, bidAmount, side)
+      if (tokenIdToVote != ALPH){
+         updateAmount{caller -> ALPH: dustAmount!(), tokenIdToVote: bidAmount}(caller, bidAmount, side)
+      } else {
+         updateAmount{caller -> tokenIdToVote: bidAmount}(caller, bidAmount, side)
 
+      }
+      
       counterAttendees = counterAttendees + 1
 
       emit Bet(selfContractId, caller, amount, side, claimedByAnyoneTimestamp)
