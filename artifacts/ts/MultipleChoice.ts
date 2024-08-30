@@ -394,7 +394,7 @@ export const MultipleChoice = new Factory(
   Contract.fromJson(
     MultipleChoiceContractJson,
     "",
-    "f5748d5b9654c2648f19945d01c4e6c1eab1eeb2d2219c10e8ceb6e70c67ec6d",
+    "4fc7dfa37c861f9936f8056b64f0d48d55214c017fbd0e1d5d519ee8102171e8",
     []
   )
 );

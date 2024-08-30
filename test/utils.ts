@@ -1,6 +1,7 @@
 import {
   ALPH_TOKEN_ID,
   Address,
+  ContractState,
   DUST_AMOUNT,
   ExecuteScriptParams,
   MINIMAL_CONTRACT_DEPOSIT,
@@ -8,6 +9,7 @@ import {
   SignerProvider,
   binToHex,
   groupOfAddress,
+  number256ToBigint,
   stringToHex,
   subContractId,
   web3,
@@ -154,6 +156,7 @@ export async function bid(
     tokenIdToHodl !== ALPH_TOKEN_ID &&
     tokenIdToVote != ALPH_TOKEN_ID
   ) {
+
     data.attoAlphAmount =
       MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
     data.tokens = [
@@ -163,9 +166,10 @@ export async function bid(
       },
       { id: tokenIdToVote, amount: amount },
     ];
+
   } else if (tokenIdToHodl == ALPH_TOKEN_ID && tokenIdToVote != ALPH_TOKEN_ID) {
-   
-    data.attoAlphAmount = MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
+
+    data.attoAlphAmount = amountHodl+MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
     data.tokens = [
       {
         id: tokenIdToVote,
@@ -192,7 +196,7 @@ export async function claim(
       predict: predict.contractId,
       addressToClaim: addressToClaim,
     },
-    attoAlphAmount: 2n * DUST_AMOUNT,
+    attoAlphAmount: 10n * DUST_AMOUNT,
   });
 }
 
@@ -302,3 +306,13 @@ export const alphBalanceOf = async (address: string): Promise<bigint> => {
   const balance = balances.balance;
   return balance === undefined ? 0n : BigInt(balance);
 };
+
+export const balanceOf = async (tokenId: string, address: string): Promise<bigint> => {
+   const balances = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(address)
+   const balance = balances.tokenBalances?.find((t) => t.id === tokenId)
+   return balance === undefined ? 0n : BigInt(balance.amount)
+}
+
+export const  expectedRewardsBidder = ( amountBid: bigint, rewardAmount: bigint, rewardBaseCalAmount:bigint): bigint => {
+   return (amountBid * rewardAmount ) / rewardBaseCalAmount
+}

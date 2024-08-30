@@ -6,10 +6,9 @@ TxScript BidMultipleChoice(predict: MultipleChoice, tokenIdToHodl: ByteVec, amou
    } else if (tokenIdToVote == ALPH && amountHodl > 0){
       predict.bid{caller -> ALPH : amount + amountHodl}(amount, side)
    }else if(amountHodl > 0){
-      // 0.01 alph for the token spam protection
-      predict.bid{caller -> ALPH : minimalContractDeposit!()+dustAmount!(), tokenIdToVote: amount, tokenIdToHodl: amountHodl}(amount, side) 
+      predict.bid{caller -> ALPH : minimalContractDeposit!(), tokenIdToVote: amount, tokenIdToHodl: amountHodl}(amount, side) 
    }else{
-      predict.bid{caller -> ALPH : minimalContractDeposit!()+dustAmount!(), tokenIdToVote: amount}(amount, side)
+      predict.bid{caller -> ALPH : minimalContractDeposit!(), tokenIdToVote: amount}(amount, side)
    }
    
 }

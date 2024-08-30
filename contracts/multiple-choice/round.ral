@@ -61,9 +61,9 @@ Contract MultipleChoice(
       amountPunters[side] = amountPunters[side] + amount
 
       transferTokenToSelf!(from, tokenIdToVote, amount)
-      if(tokenIdToVote != ALPH){
-         transferTokenToSelf!(from, ALPH, dustAmount!())
-      }
+     // if(tokenIdToVote != ALPH){
+     //    transferTokenToSelf!(from, ALPH, dustAmount!())
+     // }
    }
 
    @using(updateFields = true, assetsInContract = true)
@@ -74,7 +74,7 @@ Contract MultipleChoice(
       if (rewardAmount > 0) {
          if(sideWon == sideBid){
                let userReward = (amountBid * rewardAmount) / rewardBaseCalAmount
-               transferTokenFromSelf!(addressPunter, tokenIdToHodl, userReward)
+               transferTokenFromSelf!(addressPunter, tokenIdToVote, userReward)
 
                totalAmount = totalAmount - userReward
          }
@@ -154,12 +154,7 @@ Contract MultipleChoice(
          assert!(tokenHodling >= amountToHodl, ErrorCodes.NotEnoughTokenHodling)
       }
 
-      if (tokenIdToVote != ALPH){
-         updateAmount{caller -> ALPH: dustAmount!(), tokenIdToVote: bidAmount}(caller, bidAmount, side)
-      } else {
-         updateAmount{caller -> tokenIdToVote: bidAmount}(caller, bidAmount, side)
-
-      }
+      updateAmount{caller -> tokenIdToVote: bidAmount}(caller, bidAmount, side)
       
       counterAttendees = counterAttendees + 1
 
