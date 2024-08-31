@@ -27,6 +27,7 @@ Contract PunterChoice(
       return claimedByAnyoneAt
    }
 
+
    @using(assetsInContract = true)
    pub fn destroy(from: Address) -> (){
       checkCaller!(callerContractId!() == predictionContractId, ErrorCodes.InvalidCaller)

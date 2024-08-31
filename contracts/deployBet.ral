@@ -19,7 +19,6 @@ Contract DeployBets(
          selfContractId!(),
          punterChoiceTemplateId,
          endTimestamp,
-         caller,
          claimedByAnyoneTimestamp,
          endBeforeEnd, // can end round before real end,
          title,
@@ -28,6 +27,7 @@ Contract DeployBets(
          tokenIdToVote,
          tokenIdToHodl,
          amountToHodl,
+         caller, // mut operator
          false, //mut rewardsComputed: Bool,
          0, //mut totalAmountBoost: U256,
          0,//mut sideWon: U256,

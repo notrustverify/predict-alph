@@ -40,7 +40,6 @@ export namespace MultipleChoiceTypes {
     betManager: HexString;
     punterTemplateId: HexString;
     endTimestamp: bigint;
-    operator: Address;
     claimedByAnyoneDelay: bigint;
     endBeforeEnd: boolean;
     title: HexString;
@@ -60,6 +59,7 @@ export namespace MultipleChoiceTypes {
     tokenIdToVote: HexString;
     tokenIdToHodl: HexString;
     amountToHodl: bigint;
+    operator: Address;
     rewardsComputed: boolean;
     totalAmountBoost: bigint;
     sideWon: bigint;
@@ -151,6 +151,10 @@ export namespace MultipleChoiceTypes {
       params: Omit<CallContractParams<{}>, "args">;
       result: CallContractResult<null>;
     };
+    newOperator: {
+      params: CallContractParams<{ newAddress: Address }>;
+      result: CallContractResult<null>;
+    };
   }
   export type CallMethodParams<T extends keyof CallMethodTable> =
     CallMethodTable[T]["params"];
@@ -208,6 +212,10 @@ export namespace MultipleChoiceTypes {
     };
     destroy: {
       params: Omit<SignExecuteContractMethodParams<{}>, "args">;
+      result: SignExecuteScriptTxResult;
+    };
+    newOperator: {
+      params: SignExecuteContractMethodParams<{ newAddress: Address }>;
       result: SignExecuteScriptTxResult;
     };
   }
@@ -386,6 +394,14 @@ class Factory extends ContractFactory<
     ): Promise<TestContractResultWithoutMaps<null>> => {
       return testMethod(this, "destroy", params, getContractByCodeHash);
     },
+    newOperator: async (
+      params: TestContractParamsWithoutMaps<
+        MultipleChoiceTypes.Fields,
+        { newAddress: Address }
+      >
+    ): Promise<TestContractResultWithoutMaps<null>> => {
+      return testMethod(this, "newOperator", params, getContractByCodeHash);
+    },
   };
 }
 
@@ -394,7 +410,7 @@ export const MultipleChoice = new Factory(
   Contract.fromJson(
     MultipleChoiceContractJson,
     "",
-    "4fc7dfa37c861f9936f8056b64f0d48d55214c017fbd0e1d5d519ee8102171e8",
+    "192d038af2b39b91225a84da178bae3f257cb0bcdc2b01f2e0f620a40b48bf76",
     []
   )
 );
@@ -566,6 +582,17 @@ export class MultipleChoiceInstance extends ContractInstance {
         getContractByCodeHash
       );
     },
+    newOperator: async (
+      params: MultipleChoiceTypes.CallMethodParams<"newOperator">
+    ): Promise<MultipleChoiceTypes.CallMethodResult<"newOperator">> => {
+      return callMethod(
+        MultipleChoice,
+        this,
+        "newOperator",
+        params,
+        getContractByCodeHash
+      );
+    },
   };
 
   transact = {
@@ -638,6 +665,11 @@ export class MultipleChoiceInstance extends ContractInstance {
       params: MultipleChoiceTypes.SignExecuteMethodParams<"destroy">
     ): Promise<MultipleChoiceTypes.SignExecuteMethodResult<"destroy">> => {
       return signExecuteMethod(MultipleChoice, this, "destroy", params);
+    },
+    newOperator: async (
+      params: MultipleChoiceTypes.SignExecuteMethodParams<"newOperator">
+    ): Promise<MultipleChoiceTypes.SignExecuteMethodResult<"newOperator">> => {
+      return signExecuteMethod(MultipleChoice, this, "newOperator", params);
     },
   };
 

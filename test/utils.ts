@@ -141,24 +141,21 @@ export async function bid(
       side: side as bigint,
       tokenIdToHodl: tokenIdToHodl,
       amountHodl: amountHodl,
-      tokenIdToVote: tokenIdToVote},
+      tokenIdToVote: tokenIdToVote,
+    },
 
-      attoAlphAmount: 0n,
-      tokens: [{ id: "", amount: 0n }],
-    }
-  
+    attoAlphAmount: 0n,
+    tokens: [{ id: "", amount: 0n }],
+  };
 
   if (tokenIdToVote == ALPH_TOKEN_ID && tokenIdToHodl == ALPH_TOKEN_ID) {
-    data.attoAlphAmount = amount + 2n * DUST_AMOUNT+amountHodl;
-    data.tokens = []
-
+    data.attoAlphAmount = amount + 2n * DUST_AMOUNT + amountHodl;
+    data.tokens = [];
   } else if (
     tokenIdToHodl !== ALPH_TOKEN_ID &&
     tokenIdToVote != ALPH_TOKEN_ID
   ) {
-
-    data.attoAlphAmount =
-      MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
+    data.attoAlphAmount = MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
     data.tokens = [
       {
         id: tokenIdToHodl,
@@ -166,10 +163,9 @@ export async function bid(
       },
       { id: tokenIdToVote, amount: amount },
     ];
-
   } else if (tokenIdToHodl == ALPH_TOKEN_ID && tokenIdToVote != ALPH_TOKEN_ID) {
-
-    data.attoAlphAmount = amountHodl+MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
+    data.attoAlphAmount =
+      amountHodl + MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
     data.tokens = [
       {
         id: tokenIdToVote,
@@ -177,8 +173,8 @@ export async function bid(
       },
     ];
   } else {
-   data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
-   data.tokens = []
+    data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
+    data.tokens = [];
   }
 
   if (predict instanceof MultipleChoiceInstance) {
@@ -307,12 +303,21 @@ export const alphBalanceOf = async (address: string): Promise<bigint> => {
   return balance === undefined ? 0n : BigInt(balance);
 };
 
-export const balanceOf = async (tokenId: string, address: string): Promise<bigint> => {
-   const balances = await web3.getCurrentNodeProvider().addresses.getAddressesAddressBalance(address)
-   const balance = balances.tokenBalances?.find((t) => t.id === tokenId)
-   return balance === undefined ? 0n : BigInt(balance.amount)
-}
+export const balanceOf = async (
+  tokenId: string,
+  address: string
+): Promise<bigint> => {
+  const balances = await web3
+    .getCurrentNodeProvider()
+    .addresses.getAddressesAddressBalance(address);
+  const balance = balances.tokenBalances?.find((t) => t.id === tokenId);
+  return balance === undefined ? 0n : BigInt(balance.amount);
+};
 
-export const  expectedRewardsBidder = ( amountBid: bigint, rewardAmount: bigint, rewardBaseCalAmount:bigint): bigint => {
-   return (amountBid * rewardAmount ) / rewardBaseCalAmount
-}
+export const expectedRewardsBidder = (
+  amountBid: bigint,
+  rewardAmount: bigint,
+  rewardBaseCalAmount: bigint
+): bigint => {
+  return (amountBid * rewardAmount) / rewardBaseCalAmount;
+};

@@ -208,7 +208,7 @@ export const DeployBets = new Factory(
   Contract.fromJson(
     DeployBetsContractJson,
     "",
-    "89aa9560810cce4fc08439d52bf20a839df9e40b4a8e57a35b0dc5065423af2c",
+    "1f8a75e96f73dc801c208d4918530f51bd3ae4886cb280d553355886b2549c1b",
     []
   )
 );

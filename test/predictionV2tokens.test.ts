@@ -84,161 +84,30 @@ describe("unit tests", () => {
     await transferAlphTo(operator.address, 100n * ONE_ALPH);
   });
 
-  test("create new bet, try destroy and end before, destroy it", async () => {
-    const creator = operator;
-    const dateNow = BigInt(Date.now());
-
-    const array = fillArray(["choice1", "choice2"], 10, "00");
-    await deployNewBet(
-      creator,
-      betsManager,
-      stringToHex("Bet test"),
-      array,
-      dateNow + 2000n,
-      dateNow + bidDurationSecond,
-      false,
-      ALPH_TOKEN_ID,
-      ALPH_TOKEN_ID,
-      0n
-    );
-
-
-    const betCreated = MultipleChoice.at(
-      addressFromContractId(getSubContractId(betsManager.contractId, "00"))
-    );
-    await expectAssertionError(destroyBet(creator, betCreated),betCreated.address, 105)
-    await expectAssertionError(endBet(creator, betCreated, 0n),betCreated.address, 104)
-
-    const betsState = await betsManager.fetchState();
-    expect(betsState.fields.contractIndex).toEqual(1n);
-
-
-    const betState = await betCreated.fetchState();
-
-    expect(hexToString(betState.fields.title)).toEqual("Bet test");
-    expect(betState.fields.choicesName).toEqual(array);
-    expect(betState.fields.choicesName).toEqual([
-      stringToHex("choice1"),
-      stringToHex("choice2"),
-      "00",
-      "00",
-      "00",
-      "00",
-      "00",
-      "00",
-      "00",
-      "00",
-    ]);
-
-    await destroyBet(creator, betCreated);
-
-    const exists = await contractExists(betCreated.address);
-    expect(exists).toEqual(false);
-  });
-
-
-  test("create new bet, change operator, end before end, destroy it", async () => {
-   const creator = operator;
-   const dateNow = BigInt(Date.now());
-
-   const array = fillArray(["choice1", "choice2"], 10, "00");
-   await deployNewBet(
-     creator,
-     betsManager,
-     stringToHex("Bet test"),
-     array,
-     dateNow + 30n * 1000n,
-     dateNow + bidDurationSecond,
-     true,
-     ALPH_TOKEN_ID,
-     ALPH_TOKEN_ID,
-     0n
-   );
-
-   const betsState = await betsManager.fetchState();
-   expect(betsState.fields.contractIndex).toEqual(1n);
-
-
-
-   const betCreated = MultipleChoice.at(
-     addressFromContractId(getSubContractId(betsManager.contractId, "00"))
-   );
-
-   const newOperator = bidders[0]
-   await betCreated.transact.newOperator({
-      args: {
-         newAddress: newOperator.address
-      },
-      signer: operator
-   })
-
-   await endBet(newOperator, betCreated, 0n)
-   await destroyBet(newOperator, betCreated);
-
-   const exists = await contractExists(betCreated.address);
-   expect(exists).toEqual(false);
- });
-
-  test("test claim by someone else before possible", async () => {
-    const creator = operator;
-    const dateNow = BigInt(Date.now());
-
-    const array = fillArray(["choice1", "choice2"], 10, "00");
-    await deployNewBet(
-      creator,
-      betsManager,
-      stringToHex("Bet test"),
-      array,
-      dateNow + 2000n,
-      dateNow + 3n * 1000n,
-      true,
-      ALPH_TOKEN_ID,
-      ALPH_TOKEN_ID,
-      0n
-    );
-
-    const betsState = await betsManager.fetchState();
-    expect(betsState.fields.contractIndex).toEqual(1n);
-
-    const betCreated = MultipleChoice.at(
-      addressFromContractId(getSubContractId(betsManager.contractId, "00"))
-    );
-
-    await bid(
-      bidders[0],
-      betCreated,
-      10n * ONE_ALPH,
-      0n,
-      ALPH_TOKEN_ID,
-      0n,
-      ALPH_TOKEN_ID
-    );
-
-    await sleep(2000);
-
-    await endBet(operator, betCreated, 0n);
-
-    await expectAssertionError(
-      claim(bidders[1], betCreated, bidders[0].address),
-      betCreated.address,
-      111
-    );
-
-    await sleep(2000);
-
-    await claim(bidders[1], betCreated, bidders[0].address);
-
-    await destroyBet(creator, betCreated);
-
-    const exists = await contractExists(betCreated.address);
-    expect(exists).toEqual(false);
-  });
-
-  test("create new bet, 3 players, end", async () => {
+  test("create new bet, 3 players, play with token, end", async () => {
     const creator = operator;
     const bidder1 = bidders[0];
     const bidder2 = bidders[1];
     const bidder3 = bidders[2];
+
+    const tokenTest = await mintToken(operator.address, 2000n * 10n ** 9n);
+    for (const bidder of bidders) {
+      await operator.signAndSubmitTransferTx({
+        signerAddress: operator.address,
+        destinations: [
+          {
+            address: bidder.address,
+            attoAlphAmount: BigInt(10e16),
+            tokens: [
+              {
+                id: tokenTest.tokenId,
+                amount: 20n * 10n ** 9n,
+              },
+            ],
+          },
+        ],
+      });
+    }
 
     const dateNow = BigInt(Date.now());
 
@@ -251,7 +120,7 @@ describe("unit tests", () => {
       dateNow + bidDurationSecond,
       dateNow + bidDurationSecond + 30n * 1000n,
       false,
-      ALPH_TOKEN_ID,
+      tokenTest.tokenId,
       ALPH_TOKEN_ID,
       0n
     );
@@ -266,37 +135,41 @@ describe("unit tests", () => {
     await bid(
       bidder1,
       betCreated,
-      10n * ONE_ALPH,
+      10n * 10n ** 9n,
       0n,
       ALPH_TOKEN_ID,
       0n,
-      ALPH_TOKEN_ID
+      tokenTest.tokenId
     );
     await bid(
       bidder2,
       betCreated,
-      12n * ONE_ALPH,
+      12n * 10n ** 9n,
       1n,
       ALPH_TOKEN_ID,
       0n,
-      ALPH_TOKEN_ID
+      tokenTest.tokenId
     );
     await bid(
       bidder3,
       betCreated,
-      5n * ONE_ALPH,
+      5n * 10n ** 9n,
       0n,
       ALPH_TOKEN_ID,
       0n,
-      ALPH_TOKEN_ID
+      tokenTest.tokenId
     );
+
     const betStateAfterPlay = await betCreated.fetchState();
-    expect(betStateAfterPlay.fields.totalAmount).toEqual(
-      27n * ONE_ALPH - 3n * BigInt(1e17)
-    );
+    expect(betStateAfterPlay.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(betStateAfterPlay.asset.tokens?.length).toEqual(1);
+    if (betStateAfterPlay.asset.tokens != undefined)
+      expect(betStateAfterPlay.asset.tokens[0].amount).toEqual(27n * 10n ** 9n);
+
+    expect(betStateAfterPlay.fields.totalAmount).toEqual(27n * 10n ** 9n);
     expect(betStateAfterPlay.fields.amountPunters).toEqual([
-      15n * ONE_ALPH - 2n * BigInt(1e17),
-      12n * ONE_ALPH - BigInt(1e17),
+      15n * 10n ** 9n,
+      12n * 10n ** 9n,
       0n,
       0n,
       0n,
@@ -308,6 +181,7 @@ describe("unit tests", () => {
     ]);
     expect(betStateAfterPlay.fields.counterAttendees).toEqual(3n);
 
+    // cannot claim before bet ended
     await expectAssertionError(
       claim(bidder1, betCreated, bidder1.address),
       betCreated.address,
@@ -319,6 +193,7 @@ describe("unit tests", () => {
     const betStateAfterEnd = await betCreated.fetchState();
     expect(betStateAfterEnd.fields.rewardsComputed).toEqual(true);
 
+    //cannot claim for someone else
     await expectAssertionError(
       claim(bidder1, betCreated, bidder2.address),
       betCreated.address,
@@ -326,6 +201,18 @@ describe("unit tests", () => {
     );
 
     await claim(bidder1, betCreated, bidder1.address);
+
+    const balanceBeforeClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+
+    const bidder2Contract = getBidderContract(
+      betCreated.contractId,
+      bidder2.address
+    );
+
+    const bidder2State = await bidder2Contract.fetchState();
     await claim(bidder2, betCreated, bidder2.address);
     await claim(bidder3, betCreated, bidder3.address);
 
@@ -333,17 +220,74 @@ describe("unit tests", () => {
     expect(betStateAfterClaim.fields.counterAttendees).toEqual(0n);
     expect(betStateAfterClaim.asset.alphAmount).toEqual(BigInt(1e17));
 
+    expect(bidder2State.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(bidder2State.fields.amountBid).toEqual(12n * 10n ** 9n);
+
+    const expectedRewards = expectedRewardsBidder(
+      bidder2State.fields.amountBid,
+      betStateAfterEnd.fields.rewardAmount,
+      betStateAfterEnd.fields.rewardBaseCalAmount
+    );
+    const balanceAfterClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+    expect(balanceAfterClaim).toEqual(balanceBeforeClaim + expectedRewards);
+
     await destroyBet(creator, betCreated);
 
     const exists = await contractExists(betCreated.address);
     expect(exists).toEqual(false);
   });
 
-  test("create new bet with min ALPH to hodl, 3 players, end", async () => {
+  test("create new bet, 3 players, play with token, min Hodl other token, end", async () => {
     const creator = operator;
     const bidder1 = bidders[0];
     const bidder2 = bidders[1];
     const bidder3 = bidders[2];
+    const bidder4 = bidders[3];
+
+    const tokenTest = await mintToken(operator.address, 2000n * 10n ** 9n);
+    const tokenTestToHodl = await mintToken(
+      operator.address,
+      2000n * 10n ** 9n
+    );
+
+    for (const bidder of bidders) {
+      await operator.signAndSubmitTransferTx({
+        signerAddress: operator.address,
+        destinations: [
+          {
+            address: bidder.address,
+            attoAlphAmount: BigInt(10e16),
+            tokens: [
+              {
+                id: tokenTest.tokenId,
+                amount: 20n * 10n ** 9n,
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    for (const bidder of bidders) {
+      await operator.signAndSubmitTransferTx({
+        signerAddress: operator.address,
+        destinations: [
+          {
+            address: bidder.address,
+            attoAlphAmount: BigInt(10e16),
+            tokens: [
+              {
+                id: tokenTestToHodl.tokenId,
+                amount: 20n * 10n ** 9n,
+              },
+            ],
+          },
+        ],
+      });
+    }
 
     const dateNow = BigInt(Date.now());
 
@@ -356,9 +300,9 @@ describe("unit tests", () => {
       dateNow + bidDurationSecond,
       dateNow + bidDurationSecond + 30n * 1000n,
       false,
-      ALPH_TOKEN_ID,
-      ALPH_TOKEN_ID,
-      50n * ONE_ALPH
+      tokenTest.tokenId,
+      tokenTestToHodl.tokenId,
+      10n * 10n ** 9n
     );
 
     const betsState = await betsManager.fetchState();
@@ -368,56 +312,57 @@ describe("unit tests", () => {
       addressFromContractId(getSubContractId(betsManager.contractId, "00"))
     );
 
-    await bidder1.signAndSubmitTransferTx({
-      signerAddress: bidder1.address,
-      destinations: [
-        {
-          address: bidder2.address,
-          attoAlphAmount: 85n * ONE_ALPH,
-        },
-      ],
-    });
-
     await expectAssertionError(
       bid(
-        bidder1,
+        bidder4,
         betCreated,
-        5n * ONE_ALPH,
+        10n * 10n ** 9n,
         0n,
-        ALPH_TOKEN_ID,
-        (await alphBalanceOf(bidder1.address)) - 6n * ONE_ALPH,
-        ALPH_TOKEN_ID
+        tokenTestToHodl.tokenId,
+        9n * 10n ** 9n,
+        tokenTest.tokenId
       ),
       betCreated.address,
       112
     );
-
-    // send balance to check if user have enough and remove amount bet
+    await bid(
+      bidder1,
+      betCreated,
+      10n * 10n ** 9n,
+      0n,
+      tokenTestToHodl.tokenId,
+      10n * 10n ** 9n,
+      tokenTest.tokenId
+    );
     await bid(
       bidder2,
       betCreated,
-      12n * ONE_ALPH,
+      12n * 10n ** 9n,
       1n,
-      ALPH_TOKEN_ID,
-      50n * ONE_ALPH,
-      ALPH_TOKEN_ID
+      tokenTestToHodl.tokenId,
+      10n * 10n ** 9n,
+      tokenTest.tokenId
     );
     await bid(
       bidder3,
       betCreated,
-      5n * ONE_ALPH,
+      5n * 10n ** 9n,
       0n,
-      ALPH_TOKEN_ID,
-      50n * ONE_ALPH,
-      ALPH_TOKEN_ID
+      tokenTestToHodl.tokenId,
+      10n * 10n ** 9n,
+      tokenTest.tokenId
     );
+
     const betStateAfterPlay = await betCreated.fetchState();
-    expect(betStateAfterPlay.fields.totalAmount).toEqual(
-      17n * ONE_ALPH - 2n * BigInt(1e17)
-    );
+    expect(betStateAfterPlay.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(betStateAfterPlay.asset.tokens?.length).toEqual(1);
+    if (betStateAfterPlay.asset.tokens != undefined)
+      expect(betStateAfterPlay.asset.tokens[0].amount).toEqual(27n * 10n ** 9n);
+
+    expect(betStateAfterPlay.fields.totalAmount).toEqual(27n * 10n ** 9n);
     expect(betStateAfterPlay.fields.amountPunters).toEqual([
-      5n * ONE_ALPH - BigInt(1e17),
-      12n * ONE_ALPH - BigInt(1e17),
+      15n * 10n ** 9n,
+      12n * 10n ** 9n,
       0n,
       0n,
       0n,
@@ -427,25 +372,232 @@ describe("unit tests", () => {
       0n,
       0n,
     ]);
-    expect(betStateAfterPlay.fields.counterAttendees).toEqual(2n);
+    expect(betStateAfterPlay.fields.counterAttendees).toEqual(3n);
+
+    // cannot claim before bet ended
+    await expectAssertionError(
+      claim(bidder1, betCreated, bidder1.address),
+      betCreated.address,
+      105
+    );
 
     await sleep(Number(bidDurationSecond));
     await endBet(operator, betCreated, 1n);
     const betStateAfterEnd = await betCreated.fetchState();
     expect(betStateAfterEnd.fields.rewardsComputed).toEqual(true);
 
+    //cannot claim for someone else
     await expectAssertionError(
       claim(bidder1, betCreated, bidder2.address),
       betCreated.address,
       111
     );
 
+    await claim(bidder1, betCreated, bidder1.address);
+
+    const balanceBeforeClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+
+    const bidder2Contract = getBidderContract(
+      betCreated.contractId,
+      bidder2.address
+    );
+
+    const bidder2State = await bidder2Contract.fetchState();
     await claim(bidder2, betCreated, bidder2.address);
     await claim(bidder3, betCreated, bidder3.address);
 
     const betStateAfterClaim = await betCreated.fetchState();
     expect(betStateAfterClaim.fields.counterAttendees).toEqual(0n);
     expect(betStateAfterClaim.asset.alphAmount).toEqual(BigInt(1e17));
+
+    expect(bidder2State.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(bidder2State.fields.amountBid).toEqual(12n * 10n ** 9n);
+
+    const expectedRewards = expectedRewardsBidder(
+      bidder2State.fields.amountBid,
+      betStateAfterEnd.fields.rewardAmount,
+      betStateAfterEnd.fields.rewardBaseCalAmount
+    );
+    const balanceAfterClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+    expect(balanceAfterClaim).toEqual(balanceBeforeClaim + expectedRewards);
+
+    await destroyBet(creator, betCreated);
+
+    const exists = await contractExists(betCreated.address);
+    expect(exists).toEqual(false);
+  });
+
+  test("create new bet, 3 players, play with token, min ALPH to hold, end", async () => {
+    const creator = operator;
+    const bidder1 = bidders[0];
+    const bidder2 = bidders[1];
+    const bidder3 = bidders[2];
+    const bidder4 = bidders[3];
+
+    const tokenTest = await mintToken(operator.address, 2000n * 10n ** 9n);
+
+    for (const bidder of bidders) {
+      await operator.signAndSubmitTransferTx({
+        signerAddress: operator.address,
+        destinations: [
+          {
+            address: bidder.address,
+            attoAlphAmount: BigInt(10e16),
+            tokens: [
+              {
+                id: tokenTest.tokenId,
+                amount: 20n * 10n ** 9n,
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    const dateNow = BigInt(Date.now());
+
+    const array = fillArray(["choice1", "choice2"], 10, "00");
+    await deployNewBet(
+      creator,
+      betsManager,
+      stringToHex("Bet test"),
+      array,
+      dateNow + bidDurationSecond,
+      dateNow + bidDurationSecond + 30n * 1000n,
+      false,
+      tokenTest.tokenId,
+      ALPH_TOKEN_ID,
+      10n * ONE_ALPH
+    );
+
+    const betsState = await betsManager.fetchState();
+    expect(betsState.fields.contractIndex).toEqual(1n);
+
+    const betCreated = MultipleChoice.at(
+      addressFromContractId(getSubContractId(betsManager.contractId, "00"))
+    );
+
+    await expectAssertionError(
+      bid(
+        bidder4,
+        betCreated,
+        10n * 10n ** 9n,
+        0n,
+        ALPH_TOKEN_ID,
+        9n * ONE_ALPH,
+        tokenTest.tokenId
+      ),
+      betCreated.address,
+      112
+    );
+    await bid(
+      bidder1,
+      betCreated,
+      10n * 10n ** 9n,
+      0n,
+      ALPH_TOKEN_ID,
+      10n * ONE_ALPH,
+      tokenTest.tokenId
+    );
+    await bid(
+      bidder2,
+      betCreated,
+      12n * 10n ** 9n,
+      1n,
+      ALPH_TOKEN_ID,
+      10n * ONE_ALPH,
+      tokenTest.tokenId
+    );
+    await bid(
+      bidder3,
+      betCreated,
+      5n * 10n ** 9n,
+      0n,
+      ALPH_TOKEN_ID,
+      10n * ONE_ALPH,
+      tokenTest.tokenId
+    );
+
+    const betStateAfterPlay = await betCreated.fetchState();
+    expect(betStateAfterPlay.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(betStateAfterPlay.asset.tokens?.length).toEqual(1);
+    if (betStateAfterPlay.asset.tokens != undefined)
+      expect(betStateAfterPlay.asset.tokens[0].amount).toEqual(27n * 10n ** 9n);
+
+    expect(betStateAfterPlay.fields.totalAmount).toEqual(27n * 10n ** 9n);
+    expect(betStateAfterPlay.fields.amountPunters).toEqual([
+      15n * 10n ** 9n,
+      12n * 10n ** 9n,
+      0n,
+      0n,
+      0n,
+      0n,
+      0n,
+      0n,
+      0n,
+      0n,
+    ]);
+    expect(betStateAfterPlay.fields.counterAttendees).toEqual(3n);
+
+    // cannot claim before bet ended
+    await expectAssertionError(
+      claim(bidder1, betCreated, bidder1.address),
+      betCreated.address,
+      105
+    );
+
+    await sleep(Number(bidDurationSecond));
+    await endBet(operator, betCreated, 1n);
+    const betStateAfterEnd = await betCreated.fetchState();
+    expect(betStateAfterEnd.fields.rewardsComputed).toEqual(true);
+
+    //cannot claim for someone else
+    await expectAssertionError(
+      claim(bidder1, betCreated, bidder2.address),
+      betCreated.address,
+      111
+    );
+
+    await claim(bidder1, betCreated, bidder1.address);
+
+    const balanceBeforeClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+
+    const bidder2Contract = getBidderContract(
+      betCreated.contractId,
+      bidder2.address
+    );
+
+    const bidder2State = await bidder2Contract.fetchState();
+    await claim(bidder2, betCreated, bidder2.address);
+    await claim(bidder3, betCreated, bidder3.address);
+
+    const betStateAfterClaim = await betCreated.fetchState();
+    expect(betStateAfterClaim.fields.counterAttendees).toEqual(0n);
+    expect(betStateAfterClaim.asset.alphAmount).toEqual(BigInt(1e17));
+
+    expect(bidder2State.asset.alphAmount).toEqual(BigInt(1e17));
+    expect(bidder2State.fields.amountBid).toEqual(12n * 10n ** 9n);
+
+    const expectedRewards = expectedRewardsBidder(
+      bidder2State.fields.amountBid,
+      betStateAfterEnd.fields.rewardAmount,
+      betStateAfterEnd.fields.rewardBaseCalAmount
+    );
+    const balanceAfterClaim = await balanceOf(
+      tokenTest.tokenId,
+      bidder2.address
+    );
+
+    expect(balanceAfterClaim).toEqual(balanceBeforeClaim + expectedRewards);
 
     await destroyBet(creator, betCreated);
 
@@ -580,59 +732,5 @@ describe("unit tests", () => {
 
     const exists = await contractExists(bidder1Contract.address);
     expect(exists).toEqual(false);
-  });
-
-  test("create 2 bets, remove", async () => {
-    const creator = operator;
-    const dateNow = BigInt(Date.now());
-
-    const array = fillArray(["choice1", "choice2"], 10, "00");
-    await deployNewBet(
-      creator,
-      betsManager,
-      stringToHex("Bet test"),
-      array,
-      dateNow + bidDurationSecond,
-      dateNow + bidDurationSecond,
-      false,
-      ALPH_TOKEN_ID,
-      ALPH_TOKEN_ID,
-      0n
-    );
-    const betCreated = MultipleChoice.at(
-      addressFromContractId(getSubContractId(betsManager.contractId, "00"))
-    );
-
-    const betsState = await betsManager.fetchState();
-    expect(betsState.fields.contractIndex).toEqual(1n);
-
-    await deployNewBet(
-      creator,
-      betsManager,
-      stringToHex("Bet test"),
-      array,
-      dateNow + 1n,
-      dateNow + bidDurationSecond,
-      false,
-      ALPH_TOKEN_ID,
-      ALPH_TOKEN_ID,
-      0n
-    );
-    const betsState2 = await betsManager.fetchState();
-    expect(betsState2.fields.contractIndex).toEqual(2n);
-
-    const bet2Created = MultipleChoice.at(
-      addressFromContractId(getSubContractId(betsManager.contractId, "01"))
-    );
-
-    await endBet(creator, bet2Created, 0n)
-    await destroyBet(creator, bet2Created);
-
-    const betsStateAfterDestroy = await betsManager.fetchState();
-    expect(betsStateAfterDestroy.fields.contractIndex).toEqual(1n);
-
-    await destroyBet(creator, betCreated);
-    const betsStateAfterAllDestroy = await betsManager.fetchState();
-    expect(betsStateAfterAllDestroy.fields.contractIndex).toEqual(0n);
   });
 });

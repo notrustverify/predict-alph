@@ -2,7 +2,6 @@ Contract MultipleChoice(
    betManager: ByteVec,
    punterTemplateId: ByteVec,
    endTimestamp: U256,
-   operator: Address,
    claimedByAnyoneDelay: U256,
    endBeforeEnd: Bool, // can end round before real end,
    title: ByteVec,
@@ -11,6 +10,7 @@ Contract MultipleChoice(
    tokenIdToVote: ByteVec,
    tokenIdToHodl: ByteVec,
    amountToHodl: U256,
+   mut operator: Address,
    mut rewardsComputed: Bool,
    mut totalAmountBoost: U256,
    mut sideWon: U256,
@@ -214,10 +214,18 @@ Contract MultipleChoice(
       let caller = callerAddress!()
       checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
       assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
-
+      assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
+      
       DeployBets(betManager).deleteBet(contractIndex, caller)
 
       destroySelf!(operator)
+   }
+
+
+   @using(updateFields = true)
+   pub fn newOperator(newAddress: Address) -> (){
+      checkCaller!(callerAddress!() == operator, ErrorCodes.InvalidCaller)
+      operator = newAddress
    }
 
    

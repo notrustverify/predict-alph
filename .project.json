@@ -30,9 +30,9 @@
     },
     "DeployBets": {
       "sourceFile": "deployBet.ral",
-      "sourceCodeHash": "cb82601f624b50ed5a04022a7c39056322e3b0fc37bff4eb29ad5b229de828b6",
+      "sourceCodeHash": "7e4960ac553b6039a620208b15a7d0da6ba3f32d8f390e31cb6c2aaa614750e5",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "89aa9560810cce4fc08439d52bf20a839df9e40b4a8e57a35b0dc5065423af2c"
+      "codeHashDebug": "1f8a75e96f73dc801c208d4918530f51bd3ae4886cb280d553355886b2549c1b"
     },
     "DeployNewBet": {
       "sourceFile": "scripts/deployBet.ral",
@@ -60,13 +60,13 @@
     },
     "MultipleChoice": {
       "sourceFile": "multiple-choice/round.ral",
-      "sourceCodeHash": "ddd01247d648379120a8633b87fce29547622a3f62f6a0a5577fa482182106f5",
+      "sourceCodeHash": "64d269c85406aa289cd94a6636fae6499c69c127b1a9908a33eb4db4c1ed3568",
       "bytecodeDebugPatch": "",
-      "codeHashDebug": "4fc7dfa37c861f9936f8056b64f0d48d55214c017fbd0e1d5d519ee8102171e8"
+      "codeHashDebug": "192d038af2b39b91225a84da178bae3f257cb0bcdc2b01f2e0f620a40b48bf76"
     },
     "PunterChoice": {
       "sourceFile": "multiple-choice/punterChoice.ral",
-      "sourceCodeHash": "5be0a0846646a58acf37609462531dce9dce5fe81ac83812dc92218e3d128fe0",
+      "sourceCodeHash": "ca41b6896726d13b9a9daaaccc57d9f88ec3ee93140bdc2713695b44c4d88880",
       "bytecodeDebugPatch": "",
       "codeHashDebug": "8e136164cc165fab36e544f81ac788822b6a33aad1c259a700b203931d69ac26"
     }
