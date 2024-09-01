@@ -129,7 +129,8 @@ describe("unit tests", () => {
       "00",
       "00",
     ]);
-
+    await sleep(2000)
+    await endBet(creator, betCreated, 0n)
     await destroyBet(creator, betCreated);
 
     const exists = await contractExists(betCreated.address);
@@ -190,8 +191,8 @@ describe("unit tests", () => {
       stringToHex("Bet test"),
       array,
       dateNow + 2000n,
-      dateNow + 3n * 1000n,
-      true,
+      dateNow + 4n * 1000n,
+      false,
       ALPH_TOKEN_ID,
       ALPH_TOKEN_ID,
       0n
@@ -214,15 +215,17 @@ describe("unit tests", () => {
       ALPH_TOKEN_ID
     );
 
-    await sleep(2000);
-
-    await endBet(operator, betCreated, 0n);
-
     await expectAssertionError(
       claim(bidders[1], betCreated, bidders[0].address),
       betCreated.address,
       111
     );
+
+    await sleep(2000);
+
+    await endBet(operator, betCreated, 0n);
+
+
 
     await sleep(2000);
 
@@ -592,7 +595,7 @@ describe("unit tests", () => {
       betsManager,
       stringToHex("Bet test"),
       array,
-      dateNow + bidDurationSecond,
+      dateNow + 1n,
       dateNow + bidDurationSecond,
       false,
       ALPH_TOKEN_ID,
@@ -631,6 +634,7 @@ describe("unit tests", () => {
     const betsStateAfterDestroy = await betsManager.fetchState();
     expect(betsStateAfterDestroy.fields.contractIndex).toEqual(1n);
 
+    await endBet(creator, betCreated, 0n)
     await destroyBet(creator, betCreated);
     const betsStateAfterAllDestroy = await betsManager.fetchState();
     expect(betsStateAfterAllDestroy.fields.contractIndex).toEqual(0n);

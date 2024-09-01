@@ -1,15 +1,7 @@
 TxScript BidMultipleChoice(predict: MultipleChoice, tokenIdToHodl: ByteVec, amountHodl: U256, tokenIdToVote: ByteVec, amount: U256, side: U256) {
    let caller = callerAddress!()
 
-   if(tokenIdToVote == ALPH && amountHodl <= 0 ){
-      predict.bid{caller -> ALPH : amount}(amount, side)
-   } else if (tokenIdToVote == ALPH && amountHodl > 0){
-      predict.bid{caller -> ALPH : amount + amountHodl}(amount, side)
-   }else if(amountHodl > 0){
-      predict.bid{caller -> ALPH : minimalContractDeposit!(), tokenIdToVote: amount, tokenIdToHodl: amountHodl}(amount, side) 
-   }else{
-      predict.bid{caller -> ALPH : minimalContractDeposit!(), tokenIdToVote: amount}(amount, side)
-   }
+   predict.bid{caller -> ALPH : minimalContractDeposit!(), tokenIdToVote: amount, tokenIdToHodl: amountHodl}(amount, side)
    
 }
 
