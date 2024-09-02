@@ -215,7 +215,6 @@ Contract MultipleChoice(
       checkCaller!(caller == operator, ErrorCodes.InvalidCaller)
       assert!(counterAttendees <= 0, ErrorCodes.NotAllPlayerClaimed)
       assert!(rewardsComputed, ErrorCodes.RewardsNotComputed)
-      
       DeployBets(betManager).deleteBet(contractIndex, caller)
 
       destroySelf!(operator)

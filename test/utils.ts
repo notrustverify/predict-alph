@@ -97,6 +97,19 @@ import {
    });
  }
  
+ export async function deployPriceFetcher(){
+   const result = await PriceFetcher.deployContract(PriceFetcher, { initialFields: {
+     oracle: network.settings.oracleAddress,
+     btcPrice: 0n,
+     ethPrice: 0n,
+     usdcPrice: 0n,
+     alphPrice: 0n,
+     ayinPrice: 0n
+   }})
+   console.log(`PriceFetcher contract address: ${result.contractInstance.address}, contract id: ${result.contractInstance.contractId}`)
+ }
+
+
  export async function deployNewBet(
    signer: SignerProvider,
    predict: DeployBetsInstance,
