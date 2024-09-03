@@ -31,6 +31,7 @@ import {
   alphBalanceOf,
   balanceOf,
   bid,
+  boostRound,
   claim,
   contractExists,
   deployBets,
@@ -584,6 +585,144 @@ describe("unit tests", () => {
     const exists = await contractExists(bidder1Contract.address);
     expect(exists).toEqual(false);
   });
+
+
+  test("create new bet, 3 players, boost round, check amount won", async () => {
+   const creator = operator;
+   const bidder1 = bidders[0];
+   const bidder2 = bidders[1];
+   const bidder3 = bidders[2];
+
+   const dateNow = BigInt(Date.now());
+
+   const array = fillArray(["choice1", "choice2"], 10, "00");
+   await deployNewBet(
+     creator,
+     betsManager,
+     stringToHex("Bet test"),
+     array,
+     dateNow + 3000n,
+     dateNow + bidDurationSecond + 30n * 1000n,
+     false,
+     ALPH_TOKEN_ID,
+     ALPH_TOKEN_ID,
+     0n
+   );
+
+   const betsState = await betsManager.fetchState();
+   expect(betsState.fields.contractIndex).toEqual(1n);
+
+   const betCreated = MultipleChoice.at(
+     addressFromContractId(getSubContractId(betsManager.contractId, "00"))
+   );
+
+   await bid(
+     bidder1,
+     betCreated,
+     10n * ONE_ALPH,
+     0n,
+     ALPH_TOKEN_ID,
+     0n,
+     ALPH_TOKEN_ID
+   );
+
+   await boostRound(creator, betCreated, 10n*ONE_ALPH)
+
+   await bid(
+     bidder2,
+     betCreated,
+     12n * ONE_ALPH,
+     1n,
+     ALPH_TOKEN_ID,
+     0n,
+     ALPH_TOKEN_ID
+   );
+   await bid(
+     bidder3,
+     betCreated,
+     5n * ONE_ALPH,
+     0n,
+     ALPH_TOKEN_ID,
+     0n,
+     ALPH_TOKEN_ID
+   );
+   const betStateAfterPlay = await betCreated.fetchState();
+   expect(betStateAfterPlay.fields.totalAmount).toEqual(
+     37n * ONE_ALPH - 3n * BigInt(1e17)
+   );
+   expect(betStateAfterPlay.asset.alphAmount).toEqual(
+     37n * ONE_ALPH - 2n * BigInt(1e17)
+   );
+   expect(betStateAfterPlay.fields.amountPunters).toEqual([
+     15n * ONE_ALPH - 2n * BigInt(1e17),
+     12n * ONE_ALPH - BigInt(1e17),
+     0n,
+     0n,
+     0n,
+     0n,
+     0n,
+     0n,
+     0n,
+     0n,
+   ]);
+   expect(betStateAfterPlay.fields.counterAttendees).toEqual(3n);
+
+   const bidder1Contract = getBidderContract(
+     betCreated.contractId,
+     bidder1.address
+   );
+   const bidder1State = await bidder1Contract.fetchState();
+   expect(bidder1State.asset.alphAmount).toEqual(BigInt(1e17));
+   expect(bidder1State.fields.amountBid).toEqual(
+     10n * ONE_ALPH - BigInt(1e17)
+   );
+
+   const bidder2Contract = getBidderContract(
+     betCreated.contractId,
+     bidder2.address
+   );
+   const bidder2State = await bidder2Contract.fetchState();
+   expect(bidder2State.asset.alphAmount).toEqual(BigInt(1e17));
+   expect(bidder2State.fields.amountBid).toEqual(
+     12n * ONE_ALPH - BigInt(1e17)
+   );
+
+   await sleep(3000);
+   await endBet(operator, betCreated, 1n);
+   const betStateAfterEnd = await betCreated.fetchState();
+   expect(betStateAfterEnd.fields.rewardsComputed).toEqual(true);
+   expect(betStateAfterEnd.fields.rewardBaseCalAmount).toEqual(
+     bidder2State.fields.amountBid
+   );
+   expect(betStateAfterEnd.fields.rewardAmount).toEqual(
+     37n * ONE_ALPH - 3n * BigInt(1e17)
+   );
+   expect(betStateAfterEnd.asset.alphAmount).toEqual(
+      37n * ONE_ALPH - 2n * BigInt(1e17)
+    );
+
+   
+   expect(betStateAfterEnd.fields.sideWon).toEqual(1n);
+   const balanceBeforeClaim = await alphBalanceOf(bidder2.address);
+
+   await claim(bidder1, betCreated, bidder1.address);
+   await claim(bidder2, betCreated, bidder2.address);
+   const expectedRewards = expectedRewardsBidder(
+     bidder2State.fields.amountBid,
+     betStateAfterEnd.fields.rewardAmount,
+     betStateAfterEnd.fields.rewardBaseCalAmount
+   );
+   const balanceAfterClaim = await alphBalanceOf(bidder2.address);
+   expect(balanceAfterClaim).toBeLessThan(
+     balanceBeforeClaim + expectedRewards + BigInt(1e17)
+   );
+   expect(balanceAfterClaim).toBeGreaterThan(
+     Number(balanceBeforeClaim + expectedRewards)
+   );
+
+   const exists = await contractExists(bidder1Contract.address);
+   expect(exists).toEqual(false);
+ });
 
   test("create 2 bets, remove", async () => {
     const creator = operator;

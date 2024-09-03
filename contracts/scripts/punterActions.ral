@@ -10,7 +10,7 @@ TxScript ClaimMultipleChoice(predict: MultipleChoice, addressToClaim: Address) {
 }
 
 
-TxScript BoostBet(predict: MultipleChoice, amount: U256){
+TxScript BoostBet(predict: MultipleChoice, tokenId: ByteVec, amount: U256){
    let caller = callerAddress!()
-   predict.boost{caller -> ALPH: amount}(amount)
+   predict.boost{caller -> tokenId: amount}(amount)
 }

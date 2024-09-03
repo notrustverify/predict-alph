@@ -97,7 +97,7 @@ import {
    });
  }
  
- export async function deployPriceFetcher(){
+ /*export async function deployPriceFetcher(){
    const result = await PriceFetcher.deployContract(PriceFetcher, { initialFields: {
      oracle: network.settings.oracleAddress,
      btcPrice: 0n,
@@ -107,7 +107,7 @@ import {
      ayinPrice: 0n
    }})
    console.log(`PriceFetcher contract address: ${result.contractInstance.address}, contract id: ${result.contractInstance.contractId}`)
- }
+ }*/
 
 
  export async function deployNewBet(
@@ -185,7 +185,20 @@ import {
          amount: amount,
        },
      ];
-   } else {
+   } else if (tokenIdToHodl != ALPH_TOKEN_ID && tokenIdToVote != ALPH_TOKEN_ID) {
+      data.attoAlphAmount =
+        amountHodl + MINIMAL_CONTRACT_DEPOSIT + 2n * DUST_AMOUNT;
+      data.tokens = [
+        {
+          id: tokenIdToVote,
+          amount: amount,
+        },
+        {
+         id: tokenIdToHodl,
+         amount: amountHodl,
+       },
+      ];
+    } else {
      data.attoAlphAmount = amount + 2n * DUST_AMOUNT;
      data.tokens = [];
    }
@@ -240,12 +253,30 @@ import {
  export async function boostRound(
    signer: SignerProvider,
    predict: MultipleChoiceInstance,
-   amount: bigint
+   amount: bigint,
+   tokenId?: undefined|string,
  ) {
    if (predict instanceof MultipleChoiceInstance) {
+
+      if(tokenId != undefined){
+         return await BoostBet.execute(signer, {
+            initialFields: {
+              predict: predict.contractId,
+              tokenId: tokenId,
+              amount: amount,
+            },
+            attoAlphAmount: 2n*DUST_AMOUNT,
+            tokens: [{
+               id: tokenId,
+               amount: amount
+            }]
+          });
+      }
+
      return await BoostBet.execute(signer, {
        initialFields: {
          predict: predict.contractId,
+         tokenId: ALPH_TOKEN_ID,
          amount: amount,
        },
        attoAlphAmount: amount + DUST_AMOUNT,
@@ -273,7 +304,9 @@ import {
  export async function contractExists(address: string): Promise<boolean> {
    try {
      const nodeProvider = web3.getCurrentNodeProvider();
-     await nodeProvider.contracts.getContractsAddressState(address);
+     await nodeProvider.contracts.getContractsAddressState(address, {
+        group: 0
+     });
      return true;
    } catch (error: any) {
      if (error instanceof Error && error.message.includes("KeyNotFound")) {
